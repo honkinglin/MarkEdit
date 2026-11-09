@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useImperativeHandle, useRef } from 'react';
+import type { Ref } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
@@ -38,16 +39,41 @@ const formats = [
     block: true,
   },
 ];
+export interface MarkdownEditorHandle {
+  jumpToLine: (line: number) => void;
+}
 export function MarkdownEditor({
   value,
   onChange,
   dark,
+  disabled = false,
+  ref,
 }: {
   value: string;
   onChange: (value: string) => void;
   dark: boolean;
+  disabled?: boolean;
+  ref?: Ref<MarkdownEditorHandle>;
 }) {
   const view = useRef<EditorView | null>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      jumpToLine(line) {
+        const editor = view.current;
+        if (!editor) return;
+        const position = editor.state.doc.line(
+          Math.max(1, Math.min(line, editor.state.doc.lines)),
+        ).from;
+        editor.dispatch({
+          selection: { anchor: position },
+          effects: EditorView.scrollIntoView(position, { y: 'start' }),
+        });
+        editor.focus();
+      },
+    }),
+    [],
+  );
   function format(item: (typeof formats)[number]) {
     const editor = view.current;
     if (!editor) return;
@@ -76,6 +102,7 @@ export function MarkdownEditor({
           <button
             type="button"
             key={item.label}
+            disabled={disabled}
             title={item.label}
             aria-label={item.label}
             onClick={() => format(item)}
@@ -87,6 +114,7 @@ export function MarkdownEditor({
       </div>
       <div className="code-area">
         <CodeMirror
+          editable={!disabled}
           value={value}
           onChange={onChange}
           extensions={extensions}

@@ -1,7 +1,8 @@
 import { memo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-const plugins = [remarkGfm];
+import { remarkHeadings } from '../lib/headings';
+const plugins = [remarkGfm, remarkHeadings];
 export const MarkdownPreview = memo(function MarkdownPreview({ value }: { value: string }) {
   return (
     <article className="markdown-body" aria-label="Markdown 预览">

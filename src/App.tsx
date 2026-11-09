@@ -1,152 +1,203 @@
-import { useDeferredValue, useEffect, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
   BookOpen,
   Check,
   Columns2,
-  FileText,
-  Leaf,
+  Command as CommandIcon,
+  Focus,
+  History,
+  ListTree,
   Moon,
   PanelLeftClose,
   PenLine,
+  Plus,
+  RotateCcw,
+  Save,
   Sun,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { MarkdownEditor } from './components/MarkdownEditor';
+import type { MarkdownEditorHandle } from './components/MarkdownEditor';
 import { MarkdownPreview } from './components/MarkdownPreview';
-import { DRAFT_KEY, initialDraft, markdownFilename, parseDraft } from './lib/draft';
-import type { Draft } from './lib/draft';
+import { DocumentSidebar } from './components/DocumentSidebar';
+import { CommandMenu } from './components/CommandMenu';
+import type { Command } from './components/CommandMenu';
+import { Outline } from './components/Outline';
+import { useWorkspace } from './hooks/useWorkspace';
+import { markdownFilename } from './lib/draft';
+import { exportBackup } from './lib/documents';
+import { getHeadings } from './lib/headings';
+import type { Heading } from './lib/headings';
 
 type Mode = 'edit' | 'split' | 'preview';
-function loadDraft(): { draft: Draft; error: string } {
+function readPreferences(): { dark: boolean; ratio: number } {
   try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    return { draft: raw === null ? initialDraft : parseDraft(raw), error: '' };
-  } catch {
+    const value = JSON.parse(localStorage.getItem('markedit:preferences') ?? '{}');
     return {
-      draft: { version: 1, name: '恢复草稿.md', content: '' },
-      error: '无法读取已有草稿，已暂停自动保存以保护原数据。你可以先导出当前内容，或重试读取。',
+      dark: value.dark === true,
+      ratio:
+        typeof value.ratio === 'number' && Number.isFinite(value.ratio)
+          ? Math.max(30, Math.min(70, value.ratio))
+          : 50,
     };
+  } catch {
+    return { dark: false, ratio: 50 };
   }
 }
+function downloadText(name: string, content: string, type = 'text/markdown;charset=utf-8') {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 export default function App() {
-  const [loaded] = useState(loadDraft);
-  const [draft, setDraft] = useState(loaded.draft);
-  const [blocked, setBlocked] = useState(!!loaded.error);
-  const [error, setError] = useState(loaded.error);
-  const [saved, setSaved] = useState(false);
+  const workspace = useWorkspace();
+  const { active, documents, status, error, conflict, busy, ready } = workspace;
+  const [preferences] = useState(readPreferences);
+  const [dark, setDark] = useState(preferences.dark);
+  const [ratio, setRatio] = useState(preferences.ratio);
   const [mode, setMode] = useState<Mode>('split');
-  const [dark, setDark] = useState(false);
-  const [sidebar, setSidebar] = useState(true);
-  const upload = useRef<HTMLInputElement>(null);
-  const latest = useRef(draft);
-  latest.current = draft;
-  const preview = useDeferredValue(draft.content);
+  const [sidebar, setSidebar] = useState(() => window.matchMedia('(min-width: 801px)').matches);
+  const [focus, setFocus] = useState(false);
+  const [panel, setPanel] = useState<'outline' | 'history' | null>(() =>
+    window.matchMedia('(min-width: 1201px)').matches ? 'outline' : null,
+  );
+  const [menu, setMenu] = useState(false);
+  const [notice, setNotice] = useState('');
+  const fileInput = useRef<HTMLInputElement>(null);
+  const backupInput = useRef<HTMLInputElement>(null);
+  const editor = useRef<MarkdownEditorHandle>(null);
+  const previewContainer = useRef<HTMLDivElement>(null);
+  const preview = useDeferredValue(active?.content ?? '');
+  const headings = useMemo(() => getHeadings(preview), [preview]);
 
   useEffect(() => {
-    if (blocked) return;
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      setSaved(true);
-      setError('');
+      localStorage.setItem('markedit:preferences', JSON.stringify({ dark, ratio }));
     } catch {
-      setSaved(false);
-      setError('本地保存失败，请导出 Markdown 备份。浏览器存储可能已满或不可用。');
+      /* Preferences are optional; document storage has its own error handling. */
     }
-  }, [draft, blocked]);
+  }, [dark, ratio]);
+  const flush = workspace.flush;
   useEffect(() => {
-    const guard = (event: BeforeUnloadEvent) => {
-      if (!saved && draft.content) {
+    const shortcuts = (event: KeyboardEvent) => {
+      if (event.isComposing) return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        event.returnValue = '';
+        setMenu((open) => !open);
       }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        void flush()
+          .then(() => setNotice('已保存当前文档'))
+          .catch(() => undefined);
+      }
+      if (event.key === 'Escape') setFocus(false);
     };
-    window.addEventListener('beforeunload', guard);
-    return () => window.removeEventListener('beforeunload', guard);
-  }, [saved, draft.content]);
-  function update(patch: Partial<Draft>) {
-    setSaved(false);
-    setDraft((current) => ({ ...current, ...patch }));
+    window.addEventListener('keydown', shortcuts);
+    return () => window.removeEventListener('keydown', shortcuts);
+  }, [flush]);
+
+  async function run(promise: Promise<boolean>, message: string) {
+    if (await promise) setNotice(message);
+  }
+  function create() {
+    void run(workspace.create(), '已新建文档');
   }
   function download() {
-    const url = URL.createObjectURL(
-      new Blob([draft.content], { type: 'text/markdown;charset=utf-8' }),
-    );
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = markdownFilename(draft.name);
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (!active) return;
+    downloadText(markdownFilename(active.name), active.content);
+    setNotice('已导出当前 Markdown');
   }
-  async function importFile(file?: File) {
+  async function backup() {
+    try {
+      const records = await workspace.exportAll();
+      downloadText(
+        `markedit-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        exportBackup(records),
+        'application/json;charset=utf-8',
+      );
+      setNotice(`已备份 ${records.length} 份文档（含回收站与版本）`);
+    } catch {
+      /* The workspace displays persistence errors. */
+    }
+  }
+  async function importFile(file: File | undefined, isBackup = false) {
     if (!file) return;
-    if (!/\.(md|markdown|txt)$/i.test(file.name)) {
-      setError('请选择 .md、.markdown 或 .txt 文件。');
+    if (!(isBackup ? /\.json$/i : /\.(md|markdown|txt)$/i).test(file.name)) {
+      workspace.setError(isBackup ? '请选择 MarkEdit JSON 备份。' : '请选择 Markdown 或文本文件。');
       return;
     }
-    if (file.size > 1024 * 1024) {
-      setError('首版支持导入不超过 1 MB 的文本文件。');
+    if (file.size > (isBackup ? 20 : 1) * 1024 * 1024) {
+      workspace.setError(isBackup ? '备份不能超过 20 MB。' : 'Markdown 文件不能超过 1 MB。');
       return;
     }
     try {
       const content = await file.text();
-      if (
-        latest.current.content &&
-        !window.confirm('导入将替换当前草稿。需要保留的话，请先取消并导出当前文档。继续导入？')
-      )
-        return;
-      update({ name: file.name, content });
+      await run(
+        isBackup ? workspace.importBackup(content) : workspace.create({ name: file.name, content }),
+        isBackup ? '已将备份导入为独立副本，现有文档未被覆盖' : '已导入为新文档',
+      );
     } catch {
-      setError('文件读取失败，请重新选择文件。');
+      workspace.setError('文件读取失败，请重新选择。');
     }
   }
-  function retryRead() {
-    const result = loadDraft();
-    if (result.error) {
-      setError(result.error);
-      return;
-    }
-    if (draft.content && !window.confirm('重试读取会用已存草稿替换当前内容，继续？')) return;
-    setDraft(result.draft);
-    setBlocked(false);
-    setError('');
+  function jump(heading: Heading) {
+    if (mode !== 'preview') editor.current?.jumpToLine(heading.line);
+    const target = previewContainer.current?.querySelector<HTMLElement>(`[id="${heading.id}"]`);
+    target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
-  const characters = Array.from(draft.content.replace(/\s/g, '')).length;
+  const commands: Command[] = [
+    { label: '新建文档', run: create, disabled: !ready || busy },
+    {
+      label: '保存当前文档',
+      shortcut: '⌘/Ctrl S',
+      run: () =>
+        void flush()
+          .then(() => setNotice('已保存当前文档'))
+          .catch(() => undefined),
+      disabled: !active || busy,
+    },
+    {
+      label: '导入 Markdown 为新文档',
+      run: () => fileInput.current?.click(),
+      disabled: !ready || busy,
+    },
+    { label: '导出当前 Markdown', run: download, disabled: !active },
+    { label: '备份全部文档与历史', run: () => void backup(), disabled: !ready || busy },
+    { label: '导入工作台备份', run: () => backupInput.current?.click(), disabled: !ready || busy },
+    {
+      label: '保存版本快照',
+      run: () => void run(workspace.checkpoint(), '已保存版本快照'),
+      disabled: !active || busy,
+    },
+    { label: '查看版本历史', run: () => setPanel('history'), disabled: !active },
+    { label: '查看文档目录', run: () => setPanel('outline') },
+    {
+      label: focus ? '退出专注模式' : '进入专注模式',
+      shortcut: 'Esc 退出',
+      run: () => setFocus((value) => !value),
+    },
+    { label: dark ? '切换浅色主题' : '切换深色主题', run: () => setDark((value) => !value) },
+  ];
   return (
-    <div className={`app ${dark ? 'dark' : ''}`}>
-      {sidebar && (
-        <aside className="sidebar">
-          <a className="brand" href="#">
-            <span className="brand-mark">
-              <Leaf size={22} />
-            </span>
-            MarkEdit<span className="brand-dot">.</span>
-          </a>
-          <div className="workspace-label">
-            个人工作空间 <span>LOCAL</span>
-          </div>
-          <div className="nav-item">
-            <BookOpen size={17} /> 我的草稿 <span>1</span>
-          </div>
-          <div className="section-label">正在写作</div>
-          <div className="document-item">
-            <FileText size={17} />
-            <span>{draft.name || '未命名.md'}</span>
-            <span className="active-dot" />
-          </div>
-          <div className="sidebar-note">
-            <span className="note-line" />
-            <p>
-              每一个想法，
-              <br />
-              都值得一个开始。
-            </p>
-            <small>一点记录，一点生长。</small>
-          </div>
-          <div className="local-badge">
-            <span /> 文件保存在此浏览器
-          </div>
-        </aside>
+    <div className={`app ${dark ? 'dark' : ''} ${focus ? 'focus-mode' : ''}`}>
+      {sidebar && !focus && (
+        <DocumentSidebar
+          documents={documents}
+          active={active}
+          busy={busy || !ready}
+          onSelect={(id) => void run(workspace.switchDocument(id), '已切换文档')}
+          onCreate={create}
+          onRestore={(doc) => void run(workspace.restore(doc), '已恢复文档')}
+          onClose={() => setSidebar(false)}
+        />
       )}
       <main className="workspace">
         <header className="topbar">
@@ -154,15 +205,23 @@ export default function App() {
             <button
               className="icon-button"
               aria-label={sidebar ? '收起侧栏' : '展开侧栏'}
-              onClick={() => setSidebar(!sidebar)}
+              onClick={() => setSidebar((value) => !value)}
             >
               <PanelLeftClose size={18} />
             </button>
-            <span>我的草稿</span>
+            <span>我的文档</span>
             <span className="slash">/</span>
-            <strong>{draft.name || '未命名.md'}</strong>
+            <strong>{active?.name || '写作空间'}</strong>
           </div>
           <div className="header-actions">
+            <button
+              className="icon-button"
+              title="命令菜单 · ⌘/Ctrl K"
+              aria-label="打开命令菜单"
+              onClick={() => setMenu(true)}
+            >
+              <CommandIcon size={18} />
+            </button>
             <button
               className="icon-button"
               aria-label={dark ? '切换浅色主题' : '切换深色主题'}
@@ -170,111 +229,291 @@ export default function App() {
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button className="text-button" onClick={() => upload.current?.click()}>
+            <button
+              className="text-button"
+              disabled={!ready || busy}
+              onClick={() => fileInput.current?.click()}
+            >
               <ArrowUpFromLine size={16} />
               导入
             </button>
-            <button className="export-button" onClick={download}>
+            <button className="export-button" disabled={!active} onClick={download}>
               <ArrowDownToLine size={16} />
               导出 Markdown
             </button>
-            <input
-              ref={upload}
-              type="file"
-              accept=".md,.markdown,.txt"
-              hidden
-              onChange={(event) => {
-                void importFile(event.target.files?.[0]);
-                event.target.value = '';
-              }}
-            />
           </div>
         </header>
-        <div className="document-heading">
-          <div>
-            <div className="eyebrow">YOUR SPACE TO THINK</div>
-            <label className="title-label">
-              <input
-                aria-label="文档名称"
-                value={draft.name}
-                onChange={(event) => update({ name: event.target.value })}
-                maxLength={120}
-              />
-            </label>
-            <div className="save-label" role="status">
-              <span className={saved ? 'status-dot' : 'status-dot pending'} />
-              {blocked ? '自动保存已暂停' : saved ? '所有更改已保存到本地' : '尚未保存'}
-              <span className="meta-separator">·</span>Markdown 文档
-            </div>
-          </div>
-          <div className="view-switch" role="group" aria-label="编辑视图">
-            {(
-              [
-                { id: 'edit', label: '编辑', icon: PenLine },
-                { id: 'split', label: '分屏', icon: Columns2 },
-                { id: 'preview', label: '预览', icon: BookOpen },
-              ] as const
-            ).map((item) => (
-              <button
-                key={item.id}
-                aria-pressed={mode === item.id}
-                onClick={() => setMode(item.id)}
-              >
-                <item.icon size={15} />
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <input
+          ref={fileInput}
+          type="file"
+          accept=".md,.markdown,.txt"
+          hidden
+          onChange={(event) => {
+            void importFile(event.target.files?.[0]);
+            event.target.value = '';
+          }}
+        />
+        <input
+          ref={backupInput}
+          type="file"
+          accept=".json"
+          hidden
+          onChange={(event) => {
+            void importFile(event.target.files?.[0], true);
+            event.target.value = '';
+          }}
+        />
         {error && (
           <div className="error-banner" role="alert">
             {error}
-            {blocked && <button onClick={retryRead}>重试读取</button>}
+            <div className="error-actions">
+              {conflict ? (
+                <>
+                  <button
+                    disabled={busy}
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          '载入最新版本会丢弃本页未保存修改。你也可以取消后选择另存副本。继续？',
+                        )
+                      )
+                        void run(workspace.reloadRemote(), '已载入最新版本');
+                    }}
+                  >
+                    载入最新版本
+                  </button>
+                  <button
+                    disabled={busy}
+                    onClick={() => void run(workspace.saveCopy(), '已另存冲突副本')}
+                  >
+                    另存副本
+                  </button>
+                </>
+              ) : (
+                <button disabled={busy} onClick={workspace.retry}>
+                  重试保存 / 加载
+                </button>
+              )}
+              {active && <button onClick={download}>导出当前内容</button>}
+            </div>
           </div>
         )}
-        <div className={`editor-shell mode-${mode}`}>
-          <div className="editor-column" hidden={mode === 'preview'}>
-            <div className="pane-label">
-              <span>
-                <PenLine size={13} />
-                编辑器
-              </span>
-              <span>MARKDOWN</span>
+        {active ? (
+          <>
+            <div className="document-heading">
+              <div>
+                <div className="eyebrow">YOUR SPACE TO THINK</div>
+                <label className="title-label">
+                  <input
+                    aria-label="文档名称"
+                    value={active.name}
+                    disabled={busy}
+                    onChange={(event) => workspace.edit({ name: event.target.value })}
+                    maxLength={120}
+                  />
+                </label>
+                <div className="save-label" role="status">
+                  <span className={status === 'saved' ? 'status-dot' : 'status-dot pending'} />
+                  {status === 'saved'
+                    ? '所有更改已保存到本地'
+                    : status === 'saving'
+                      ? '正在保存…'
+                      : status === 'error'
+                        ? '保存已暂停'
+                        : '等待保存…'}
+                  <span className="meta-separator">·</span>Markdown 文档
+                </div>
+              </div>
+              <div className="document-controls">
+                <button
+                  className="icon-button"
+                  aria-label="移入回收站"
+                  title="移入回收站，可恢复"
+                  disabled={busy}
+                  onClick={() => void run(workspace.remove(), '已移入回收站，可在侧栏恢复')}
+                >
+                  <Trash2 size={16} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label={focus ? '退出专注模式' : '进入专注模式'}
+                  aria-pressed={focus}
+                  onClick={() => setFocus(!focus)}
+                >
+                  <Focus size={17} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label="文档目录"
+                  aria-pressed={panel === 'outline'}
+                  onClick={() => setPanel(panel === 'outline' ? null : 'outline')}
+                >
+                  <ListTree size={17} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label="版本历史"
+                  aria-pressed={panel === 'history'}
+                  onClick={() => setPanel(panel === 'history' ? null : 'history')}
+                >
+                  <History size={17} />
+                </button>
+                <div className="view-switch" role="group" aria-label="编辑视图">
+                  {(
+                    [
+                      { id: 'edit', label: '编辑', icon: PenLine },
+                      { id: 'split', label: '分屏', icon: Columns2 },
+                      { id: 'preview', label: '预览', icon: BookOpen },
+                    ] as const
+                  ).map((item) => (
+                    <button
+                      key={item.id}
+                      aria-pressed={mode === item.id}
+                      onClick={() => setMode(item.id)}
+                    >
+                      <item.icon size={15} />
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <MarkdownEditor
-              value={draft.content}
-              onChange={(content) => update({ content })}
-              dark={dark}
-            />
+            <div className="writing-area">
+              <div
+                className={`editor-shell mode-${mode}`}
+                style={{ '--editor-width': `${ratio}%` } as CSSProperties}
+              >
+                <div className="editor-column" hidden={mode === 'preview'}>
+                  <div className="pane-label">
+                    <span>
+                      <PenLine size={13} />
+                      编辑器
+                    </span>
+                    {mode === 'split' && (
+                      <label className="split-control">
+                        分屏{' '}
+                        <input
+                          aria-label="编辑器宽度"
+                          type="range"
+                          min="30"
+                          max="70"
+                          value={ratio}
+                          onChange={(event) => setRatio(Number(event.target.value))}
+                        />
+                        <span>{ratio}%</span>
+                      </label>
+                    )}
+                  </div>
+                  <MarkdownEditor
+                    key={active.id}
+                    ref={editor}
+                    value={active.content}
+                    onChange={(content) => workspace.edit({ content })}
+                    dark={dark}
+                    disabled={busy}
+                  />
+                </div>
+                <section className="preview-column" hidden={mode === 'edit'} aria-label="预览区域">
+                  <div className="pane-label">
+                    <span>
+                      <BookOpen size={13} />
+                      实时预览
+                    </span>
+                    <span className="live-label">
+                      <span /> LIVE
+                    </span>
+                  </div>
+                  <div className="preview-scroll" ref={previewContainer}>
+                    <MarkdownPreview value={preview} />
+                  </div>
+                </section>
+              </div>
+              {!focus && panel && (
+                <aside className="detail-panel">
+                  <button
+                    className="panel-close icon-button"
+                    aria-label="关闭详情面板"
+                    onClick={() => setPanel(null)}
+                  >
+                    <X size={14} />
+                  </button>
+                  {panel === 'outline' ? (
+                    <Outline headings={headings} onJump={jump} />
+                  ) : (
+                    <section className="history-panel" aria-label="版本历史">
+                      <div className="pane-label">
+                        <span>版本历史</span>
+                      </div>
+                      <button
+                        className="snapshot-button"
+                        disabled={busy}
+                        onClick={() => void run(workspace.checkpoint(), '已保存版本快照')}
+                      >
+                        <Save size={15} />
+                        保存快照
+                      </button>
+                      <p className="empty-hint">
+                        自动版本间隔至少 30 秒，保留最近 30 份。恢复前会保存当前版本。
+                      </p>
+                      <div className="version-list">
+                        {[...active.snapshots].reverse().map((snapshot) => (
+                          <div className="version-entry" key={snapshot.id}>
+                            <strong>{snapshot.name || '未命名.md'}</strong>
+                            <time>{new Date(snapshot.createdAt).toLocaleString('zh-CN')}</time>
+                            <span>{snapshot.content.length} 字符</span>
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void run(
+                                  workspace.restoreVersion(snapshot.id),
+                                  '已恢复所选版本，恢复前的内容也已保留',
+                                )
+                              }
+                            >
+                              <RotateCcw size={13} />
+                              恢复此版本
+                            </button>
+                          </div>
+                        ))}
+                        {!active.snapshots.length && <p className="empty-hint">还没有历史版本。</p>}
+                      </div>
+                    </section>
+                  )}
+                </aside>
+              )}
+            </div>
+            <footer className="statusbar">
+              <span>
+                {Array.from(active.content.replace(/\s/g, '')).length.toLocaleString()} 字符
+                <span className="meta-separator">·</span>
+                {active.content.split('\n').length} 行
+              </span>
+              <span className="keyboard-hint">⌘ / Ctrl + K 命令菜单</span>
+              <span>
+                <Check size={13} /> UTF-8
+              </span>
+            </footer>
+          </>
+        ) : (
+          <div className="empty-workspace">
+            <BookOpen size={36} />
+            <h1>{status === 'loading' ? '正在打开文档库…' : '给下一个想法，一张白纸。'}</h1>
+            <p>
+              {status === 'loading'
+                ? '正在读取本地文档，首次使用会迁移旧草稿。'
+                : '新建文档，或者从回收站找回之前的记录。'}
+            </p>
+            <button className="export-button" disabled={!ready || busy} onClick={create}>
+              <Plus size={16} />
+              新建文档
+            </button>
           </div>
-          <section className="preview-column" hidden={mode === 'edit'} aria-label="预览区域">
-            <div className="pane-label">
-              <span>
-                <BookOpen size={13} />
-                实时预览
-              </span>
-              <span className="live-label">
-                <span /> LIVE
-              </span>
-            </div>
-            <div className="preview-scroll">
-              <MarkdownPreview value={preview} />
-            </div>
-          </section>
+        )}
+        <div className="workspace-notice" role="status" aria-live="polite">
+          {notice}
         </div>
-        <footer className="statusbar">
-          <span>
-            {characters.toLocaleString()} 字符 <span className="meta-separator">·</span>{' '}
-            {draft.content.split('\n').length} 行
-          </span>
-          <span className="keyboard-hint">
-            ⌘ / Ctrl + F 搜索 <span className="meta-separator">·</span> ⌘ / Ctrl + Z 撤销
-          </span>
-          <span>
-            <Check size={13} /> UTF-8
-          </span>
-        </footer>
       </main>
+      <CommandMenu open={menu} onClose={() => setMenu(false)} commands={commands} />
     </div>
   );
 }
