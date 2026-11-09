@@ -54,6 +54,28 @@ npm run format:check # 仅检查格式，适合提交前或 CI 使用
 
 Markdown 导入限制 1 MB；工作台 JSON 备份导入限制 20 MB、1000 份文档。备份包含历史版本，应当像正文一样保管。
 
+## 扩展语法与编辑体验（P3）
+
+可导入 [扩展语法示例](examples/extended-markdown.md) 体验公式、流程图、时序图和代码高亮。
+
+- 公式：行内 `$E=mc^2$`，独立段落使用 `$$` 包围公式；KaTeX 按需加载。
+- 图表：使用 `mermaid` 围栏代码块；错误就地展示，不中断正文。旧 `flow` / `seq` 需手动迁移为 Mermaid；`[TOC]` 仍使用工作台目录替代。
+- 高亮：按需加载 JavaScript、TypeScript、Python、JSON、CSS、HTML/XML、Bash、SQL、Markdown；未知语言和超过 100,000 字符的代码块显示纯文本。
+- 工具栏新增链接、图片 URL、表格和代码语言面板；代码块支持复制。
+- 分屏预览的“同步滚动”开关支持源码与预览双向定位，异步渲染后重新计算位置。
+
+`MarkdownEditor` 接受可选的 `uploadImage(file): Promise<string>`，用于粘贴/拖拽图片。接入方负责上传并返回 HTTP(S) URL；客户端限制 PNG/JPEG/GIF/WebP、5 MB。当前工作台没有上传后端，只提供图片 URL 输入，尚未验收真实上传服务。
+
+公式禁用可信命令并限制展开规模；Mermaid 使用 strict 模式、禁用内嵌配置及 HTML 标签，输出 SVG 再经 DOMPurify 清理。原始 HTML 仍不渲染。复杂图表可能受安全策略限制。
+
+### 性能记录
+
+超过 30,000 字符的文档合并 180ms 内的预览更新，源码输入与自动保存保持独立。运行 `npm run benchmark` 可生成 102,400 字节的中文测试文档与 `.benchmarks/report.json`；该目录不提交。
+
+2026-11-09，Node 24.14.0 / macOS arm64，20 次热运行：目录解析中位数 19.11ms / P95 27.77ms；预览服务端渲染中位数 31.87ms / P95 33.60ms。此数据不包含浏览器布局、输入到绘制延迟、网络或异步图表渲染。
+
+浏览器开发模式（StrictMode）对同一长文连续输入的 React 渲染记录约 7–11ms，停止输入后的整篇预览更新仍约 171ms；不是 60fps 或输入延迟保证。可使用开发地址 `?profile=1` 在控制台查看 React Profiler 记录。生产主包仍有大 chunk 警告，图表依赖虽按需加载但体积较大，后续继续优化。
+
 ## 开发路线
 
 完整技术选型、原项目分析、阶段任务与验收条件见 [开发计划](docs/DEVELOPMENT_PLAN.md)。本次交付和已知限制见 [实施状态](docs/IMPLEMENTATION_STATUS.md)。
@@ -61,7 +83,7 @@ Markdown 导入限制 1 MB；工作台 JSON 备份导入限制 20 MB、1000 份�
 1. P0：需求与架构计划。
 2. P1：可运行编辑闭环（已实现，验证范围见实施状态）。
 3. P2：IndexedDB 多文档、目录、版本恢复、跨标签冲突处理（已实现）。
-4. P3：公式、Mermaid、代码高亮、滚动同步、图片接口。
+4. P3：公式、Mermaid、代码高亮、滚动同步、图片接口（已实现，性能限制见下文）。
 5. P4：抽取 React 组件包、API 文档与独立消费示例。
 6. P5：CI、跨浏览器验收、性能记录、演示部署与发布。
 

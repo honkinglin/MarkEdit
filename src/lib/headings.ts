@@ -1,6 +1,7 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 import { visit } from 'unist-util-visit';
 import { toString } from 'mdast-util-to-string';
 import type { Root } from 'mdast';
@@ -11,7 +12,7 @@ export interface Heading {
   depth: number;
   line: number;
 }
-const parser = unified().use(remarkParse).use(remarkGfm);
+const parser = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
 export function annotateHeadings(tree: Root): Heading[] {
   const headings: Heading[] = [];
   const used = new Set<string>();

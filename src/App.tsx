@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
   ArrowDownToLine,
@@ -27,6 +27,8 @@ import { DocumentSidebar } from './components/DocumentSidebar';
 import { CommandMenu } from './components/CommandMenu';
 import type { Command } from './components/CommandMenu';
 import { Outline } from './components/Outline';
+import { usePreviewValue } from './hooks/usePreviewValue';
+import { useScrollSync } from './hooks/useScrollSync';
 import { useWorkspace } from './hooks/useWorkspace';
 import { markdownFilename } from './lib/draft';
 import { exportBackup } from './lib/documents';
@@ -74,7 +76,15 @@ export default function App() {
   const backupInput = useRef<HTMLInputElement>(null);
   const editor = useRef<MarkdownEditorHandle>(null);
   const previewContainer = useRef<HTMLDivElement>(null);
-  const preview = useDeferredValue(active?.content ?? '');
+  const [syncScroll, setSyncScroll] = useState(true);
+  const preview = usePreviewValue(active?.content ?? '', active?.id);
+  const { onEditorScroll, onPreviewScroll } = useScrollSync(
+    editor,
+    previewContainer,
+    syncScroll && mode === 'split',
+    preview,
+    active?.id,
+  );
   const headings = useMemo(() => getHeadings(preview), [preview]);
 
   useEffect(() => {
@@ -154,6 +164,10 @@ export default function App() {
     target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
   const commands: Command[] = [
+    {
+      label: syncScroll ? '关闭同步滚动' : '开启同步滚动',
+      run: () => setSyncScroll((value) => !value),
+    },
     { label: '新建文档', run: create, disabled: !ready || busy },
     {
       label: '保存当前文档',
@@ -407,6 +421,7 @@ export default function App() {
                   <MarkdownEditor
                     key={active.id}
                     ref={editor}
+                    onScrollLine={onEditorScroll}
                     value={active.content}
                     onChange={(content) => workspace.edit({ content })}
                     dark={dark}
@@ -419,11 +434,19 @@ export default function App() {
                       <BookOpen size={13} />
                       实时预览
                     </span>
+                    <button
+                      className="sync-toggle"
+                      aria-pressed={syncScroll}
+                      onClick={() => setSyncScroll((value) => !value)}
+                      title="基于源码行位置同步滚动"
+                    >
+                      同步滚动 {syncScroll ? '开' : '关'}
+                    </button>
                     <span className="live-label">
                       <span /> LIVE
                     </span>
                   </div>
-                  <div className="preview-scroll" ref={previewContainer}>
+                  <div className="preview-scroll" ref={previewContainer} onScroll={onPreviewScroll}>
                     <MarkdownPreview value={preview} />
                   </div>
                 </section>

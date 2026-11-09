@@ -1079,3 +1079,190 @@ button:disabled {
     top: 210px;
   }
 }
+
+/* Extended Markdown rendering and insertion panels. */
+.code-area {
+  overflow: hidden;
+  padding: 0;
+}
+.code-area .cm-content {
+  padding-top: 17px !important;
+  padding-bottom: 60px !important;
+}
+.code-area .cm-gutters {
+  padding-top: 17px;
+}
+.preview-scroll {
+  scroll-behavior: auto;
+}
+.sync-toggle {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 4px 7px;
+  color: var(--muted);
+}
+.sync-toggle[aria-pressed='true'] {
+  color: var(--accent);
+}
+.preview-column .live-label {
+  margin-left: 8px;
+}
+.formula-block {
+  display: block;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+.formula-loading {
+  font-family: monospace;
+  color: var(--muted);
+}
+.render-error {
+  display: block;
+  border-left: 3px solid #b68b42;
+  background: var(--sidebar);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.render-error p {
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+.render-error pre {
+  white-space: pre-wrap;
+}
+.code-block {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+.code-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--sidebar);
+  color: var(--muted);
+  font-size: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.markdown-body .code-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color: #8054a3;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-attr {
+  color: #2c7250;
+}
+.hljs-title,
+.hljs-function,
+.hljs-built_in {
+  color: #286d9c;
+}
+.hljs-number,
+.hljs-symbol {
+  color: #b26432;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #828b80;
+  font-style: italic;
+}
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-literal {
+  color: #cba5ef;
+}
+.dark .hljs-string,
+.dark .hljs-attr {
+  color: #9bd6af;
+}
+.dark .hljs-title,
+.dark .hljs-built_in {
+  color: #91c9ef;
+}
+.dark .hljs-number {
+  color: #e5af87;
+}
+.mermaid-block {
+  margin: 20px 0;
+  padding: 14px;
+  background: #fff;
+  color: #293932;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: auto;
+}
+.mermaid-block svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+.diagram-loading {
+  color: #6a756c;
+  font-size: 11px;
+}
+.mermaid-render-host {
+  position: absolute;
+  left: -100000px;
+  top: 0;
+  width: 1200px;
+  visibility: hidden;
+  pointer-events: none;
+}
+.insert-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+  margin: 14px 0;
+}
+.insert-dialog input,
+.insert-dialog select,
+.insert-dialog textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--canvas);
+  padding: 9px;
+  color: var(--text);
+}
+.insert-dialog textarea {
+  resize: vertical;
+  font-family: monospace;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+}
+.dialog-actions button {
+  padding: 8px 16px;
+}
+.table-dimensions {
+  display: flex;
+  gap: 14px;
+}
+.editor-notice {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 11px;
+  background: var(--sidebar);
+  color: var(--muted);
+}
+@media (max-width: 1200px) {
+  .preview-column .live-label {
+    display: none;
+  }
+}
