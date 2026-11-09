@@ -1,19 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { fencedCode, linkMarkdown, tableMarkdown } from '../lib/insertions';
 export type InsertKind = 'link' | 'image' | 'table' | 'code';
 const titles = { link: '插入链接', image: '插入图片', table: '插入表格', code: '插入代码块' };
 export function InsertDialog({
   kind,
+  portal = false,
+  dark = false,
   selected,
   onClose,
   onInsert,
 }: {
   kind: InsertKind | null;
+  portal?: boolean;
+  dark?: boolean;
   selected: string;
   onClose: () => void;
   onInsert: (text: string, block: boolean) => void;
 }) {
+  const titleId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const [label, setLabel] = useState('');
   const [url, setUrl] = useState('');
@@ -31,22 +37,23 @@ export function InsertDialog({
       dialog.current?.showModal();
     } else dialog.current?.close();
   }, [kind, selected]);
-  return (
+  const content = (
     <dialog
       ref={dialog}
       className="command-dialog insert-dialog"
-      aria-labelledby="insert-title"
+      aria-labelledby={titleId}
       onCancel={onClose}
     >
       <div className="dialog-heading">
-        <h2 id="insert-title">{kind ? titles[kind] : '插入内容'}</h2>
-        <button aria-label="关闭插入面板" onClick={onClose}>
+        <h2 id={titleId}>{kind ? titles[kind] : '插入内容'}</h2>
+        <button type="button" aria-label="关闭插入面板" onClick={onClose}>
           <X size={18} />
         </button>
       </div>
       <form
         onSubmit={(event) => {
           event.preventDefault();
+          event.stopPropagation();
           try {
             if (!kind) return;
             const text =
@@ -159,4 +166,13 @@ export function InsertDialog({
       </form>
     </dialog>
   );
+  if (!portal) return content;
+  return typeof document === 'undefined'
+    ? null
+    : createPortal(
+        <div className="markedit" data-theme={dark ? 'dark' : 'light'}>
+          {content}
+        </div>,
+        document.body,
+      );
 }

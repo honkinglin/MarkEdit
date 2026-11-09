@@ -10,7 +10,13 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "benchmark": "node --import tsx scripts/benchmark.tsx"
+    "benchmark": "node --import tsx scripts/benchmark.tsx",
+    "build:lib": "npm run build --workspace @markedit/react",
+    "pack:lib": "npm run build:lib && node scripts/pack-library.mjs",
+    "example:setup": "npm run pack:lib && npm install --prefix examples/react-consumer ./.benchmarks/markedit-react-0.1.0.tgz",
+    "example:dev": "npm run dev --prefix examples/react-consumer",
+    "example:build": "npm run build --prefix examples/react-consumer",
+    "verify:lib": "npm run build:lib && node scripts/verify-package.mjs"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.0",
@@ -44,11 +50,15 @@
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "vite": "^7.3.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "postcss": "^8.5.32"
   },
   "overrides": {
     "micromark-extension-math": {
       "katex": "$katex"
     }
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

@@ -21,7 +21,9 @@ describe('Markdown AST 目录', () => {
   it('目录文本不含内联 Markdown 标记，目录与预览使用相同 ID', () => {
     const content = '# **标题** 与 [链接](https://example.com)\n\n## 标题\n\n## 标题';
     const headings = getHeadings(content);
-    const html = renderToStaticMarkup(createElement(MarkdownPreview, { value: content }));
+    const html = renderToStaticMarkup(
+      createElement(MarkdownPreview, { value: content, headingPrefix: '' }),
+    );
     expect(headings[0].text).toBe('标题 与 链接');
     for (const heading of headings) expect(html).toContain(`id="${heading.id}"`);
   });

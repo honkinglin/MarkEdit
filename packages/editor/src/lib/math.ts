@@ -1,5 +1,5 @@
 import katex from 'katex';
-import 'katex/dist/katex.min.css';
+import './math.css';
 export function renderFormula(source: string, display: boolean) {
   if (source.length > 10_000) throw new Error('公式超过 10,000 字符限制');
   return katex.renderToString(source, {

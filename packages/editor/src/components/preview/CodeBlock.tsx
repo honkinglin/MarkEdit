@@ -27,6 +27,7 @@ export function CodeBlock({ source, language }: { source: string; language: stri
       <div className="code-caption">
         <span>{language || 'text'}</span>
         <button
+          type="button"
           onClick={() => {
             if (!navigator.clipboard) {
               setCopied('复制失败，请手动选择');

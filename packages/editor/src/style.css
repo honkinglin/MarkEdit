@@ -1,0 +1,460 @@
+.markedit {
+  --bg: #fff;
+  --canvas: #fbfbf9;
+  --text: #293932;
+  --muted: #7d867f;
+  --line: #e6e9e3;
+  --hover: #e9eee7;
+  --accent: #326c52;
+  color: var(--text);
+  background: var(--bg);
+  font:
+    13px/1.6 Inter,
+    system-ui,
+    sans-serif;
+  color-scheme: light;
+}
+.markedit[data-theme='dark'] {
+  --bg: #1d2522;
+  --canvas: #19201d;
+  --text: #d6e2d9;
+  --muted: #9aa79f;
+  --line: #334139;
+  --hover: #2b3c31;
+  --accent: #8bc5a6;
+  color-scheme: dark;
+}
+.markedit,
+.markedit * {
+  box-sizing: border-box;
+}
+.markedit [hidden] {
+  display: none !important;
+}
+.markedit button,
+.markedit input,
+.markedit textarea,
+.markedit select {
+  font: inherit;
+}
+.markedit button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.markedit button:hover {
+  background: var(--hover);
+}
+.markedit button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.markedit :is(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.markedit-editor {
+  display: flex;
+  min-height: 180px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.markedit-editor > .markedit-source,
+.markedit-editor > .markedit-preview-scroll {
+  width: 50%;
+  min-width: 0;
+  min-height: 0;
+}
+.markedit-editor > .markedit-source {
+  display: flex;
+  border-right: 1px solid var(--line);
+}
+.markedit-editor > .markedit-preview-scroll {
+  overflow: auto;
+}
+.markedit-editor[data-mode='edit'] > .markedit-source,
+.markedit-editor[data-mode='preview'] > .markedit-preview-scroll {
+  width: 100%;
+  border: 0;
+}
+.markedit .format-toolbar {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 43px;
+  padding-block: 6px;
+}
+@media (max-width: 600px) {
+  .markedit-editor[data-mode='split'] {
+    flex-direction: column;
+  }
+  .markedit-editor[data-mode='split'] > .markedit-source,
+  .markedit-editor[data-mode='split'] > .markedit-preview-scroll {
+    width: 100%;
+    height: 50%;
+  }
+}
+
+.markedit .export-button {
+  padding: 9px 13px;
+  background: #326c52;
+  color: #fff;
+  font-size: 11px;
+}
+.markedit .export-button:hover {
+  background: #255840;
+}
+.markedit .source-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.markedit .format-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 43px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.markedit .format-toolbar button {
+  height: 27px;
+  width: 28px;
+  color: var(--muted);
+}
+.markedit .toolbar-hint {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--muted);
+}
+.markedit .code-area {
+  overflow: auto;
+  flex: 1;
+  padding: 17px 8px 30px 0;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.markedit .cm-editor {
+  background: transparent !important;
+}
+.markedit .cm-scroller {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace !important;
+}
+.markedit .cm-gutters {
+  background: transparent !important;
+  border: 0 !important;
+  color: #aeb7ad !important;
+  min-width: 42px;
+}
+.markedit .cm-content {
+  padding: 0 10px !important;
+}
+.markedit .cm-focused {
+  outline: none !important;
+}
+.markedit .markdown-body {
+  padding: 30px 35px 60px;
+  line-height: 1.95;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.markedit .markdown-body > :first-child {
+  margin-top: 0;
+}
+.markedit .markdown-body h1 {
+  font-size: 27px;
+  line-height: 1.5;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+.markedit .markdown-body h2 {
+  font-size: 18px;
+  margin: 30px 0 12px;
+  letter-spacing: -0.3px;
+}
+.markedit .markdown-body h3 {
+  font-size: 16px;
+}
+.markedit .markdown-body p {
+  margin: 14px 0;
+  color: var(--text);
+}
+.markedit .markdown-body strong {
+  font-weight: 600;
+}
+.markedit .markdown-body blockquote {
+  margin: 24px 0;
+  padding: 2px 17px;
+  border-left: 3px solid #91ab8c;
+  background: var(--canvas);
+  color: var(--muted);
+}
+.markedit .markdown-body blockquote p {
+  color: var(--muted);
+  font-size: 12px;
+}
+.markedit .markdown-body ul,
+.markedit .markdown-body ol {
+  padding-left: 21px;
+}
+.markedit .markdown-body li {
+  padding: 3px 0;
+}
+.markedit .markdown-body .contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+.markedit .markdown-body input[type='checkbox'] {
+  accent-color: #527c58;
+  margin-right: 8px;
+}
+.markedit .markdown-body pre {
+  background: var(--sidebar);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 17px;
+  font-size: 11px;
+  overflow: auto;
+  line-height: 1.8;
+}
+.markedit .markdown-body code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.9em;
+}
+.markedit .markdown-body :not(pre) > code {
+  background: var(--sidebar);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.markedit .markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+  margin: 20px 0;
+}
+.markedit .markdown-body th,
+.markedit .markdown-body td {
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  text-align: left;
+}
+.markedit .markdown-body th {
+  background: var(--canvas);
+}
+.markedit .markdown-body a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+.markedit .markdown-body img {
+  max-width: 100%;
+  height: auto;
+}
+.markedit .markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 28px 0;
+}
+.markedit .empty-hint {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+  padding: 0 12px;
+}
+.markedit .markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 20px;
+}
+.markedit .command-dialog {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  width: min(500px, calc(100vw - 28px));
+  padding: 20px;
+  max-height: 80dvh;
+  box-shadow: 0 20px 90px #0003;
+}
+.markedit .command-dialog::backdrop {
+  background: #15231d66;
+  backdrop-filter: blur(3px);
+}
+.markedit .dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.markedit .dialog-heading h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+.markedit .code-area {
+  overflow: hidden;
+  padding: 0;
+}
+.markedit .code-area .cm-content {
+  padding-top: 17px !important;
+  padding-bottom: 60px !important;
+}
+.markedit .code-area .cm-gutters {
+  padding-top: 17px;
+}
+.markedit .formula-block {
+  display: block;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+.markedit .formula-loading {
+  font-family: monospace;
+  color: var(--muted);
+}
+.markedit .render-error {
+  display: block;
+  border-left: 3px solid #b68b42;
+  background: var(--sidebar);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.markedit .render-error p {
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+.markedit .render-error pre {
+  white-space: pre-wrap;
+}
+.markedit .code-block {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+.markedit .code-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--sidebar);
+  color: var(--muted);
+  font-size: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.markedit .markdown-body .code-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.markedit .hljs-keyword,
+.markedit .hljs-selector-tag,
+.markedit .hljs-literal {
+  color: #8054a3;
+}
+.markedit .hljs-string,
+.markedit .hljs-regexp,
+.markedit .hljs-attr {
+  color: #2c7250;
+}
+.markedit .hljs-title,
+.markedit .hljs-function,
+.markedit .hljs-built_in {
+  color: #286d9c;
+}
+.markedit .hljs-number,
+.markedit .hljs-symbol {
+  color: #b26432;
+}
+.markedit .hljs-comment,
+.markedit .hljs-quote {
+  color: #828b80;
+  font-style: italic;
+}
+.markedit[data-theme='dark'] .hljs-keyword,
+.markedit[data-theme='dark'] .hljs-selector-tag,
+.markedit[data-theme='dark'] .hljs-literal {
+  color: #cba5ef;
+}
+.markedit[data-theme='dark'] .hljs-string,
+.markedit[data-theme='dark'] .hljs-attr {
+  color: #9bd6af;
+}
+.markedit[data-theme='dark'] .hljs-title,
+.markedit[data-theme='dark'] .hljs-built_in {
+  color: #91c9ef;
+}
+.markedit[data-theme='dark'] .hljs-number {
+  color: #e5af87;
+}
+.markedit .mermaid-block {
+  margin: 20px 0;
+  padding: 14px;
+  background: #fff;
+  color: #293932;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: auto;
+}
+.markedit .mermaid-block svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+.markedit .diagram-loading {
+  color: #6a756c;
+  font-size: 11px;
+}
+.markedit .insert-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+  margin: 14px 0;
+}
+.markedit .insert-dialog input,
+.markedit .insert-dialog select,
+.markedit .insert-dialog textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--canvas);
+  padding: 9px;
+  color: var(--text);
+}
+.markedit .insert-dialog textarea {
+  resize: vertical;
+  font-family: monospace;
+}
+.markedit .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+}
+.markedit .dialog-actions button {
+  padding: 8px 16px;
+}
+.markedit .table-dimensions {
+  display: flex;
+  gap: 14px;
+}
+.markedit .editor-notice {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 11px;
+  background: var(--sidebar);
+  color: var(--muted);
+}
+
+.markedit .format-toolbar {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 43px;
+  padding-block: 6px;
+}

@@ -76,6 +76,24 @@ Markdown 导入限制 1 MB；工作台 JSON 备份导入限制 20 MB、1000 份�
 
 浏览器开发模式（StrictMode）对同一长文连续输入的 React 渲染记录约 7–11ms，停止输入后的整篇预览更新仍约 171ms；不是 60fps 或输入延迟保证。可使用开发地址 `?profile=1` 在控制台查看 React Profiler 记录。生产主包仍有大 chunk 警告，图表依赖虽按需加载但体积较大，后续继续优化。
 
+## React 组件包（P4）
+
+编辑器和预览的实现已移入 `packages/editor`，工作台通过薄适配层复用；存储、文档管理和导入导出仍由应用负责。独立包暂名 `@markedit/react`，保持 `private: true`，未发布 npm。ESM、类型声明与 CSS 可通过本地 tarball 接入 React 19 应用。
+
+```bash
+npm run verify:lib    # 构建组件包，检查 CSS 作用域、字体资源和类型产物
+npm run pack:lib      # 生成 .benchmarks/markedit-react-0.1.0.tgz
+npm run example:setup # 构建打包，并安装到独立 React 示例
+npm run example:dev   # 启动独立示例
+npm run example:build # 验证示例类型与生产构建
+```
+
+组件支持 `value/onChange`、`defaultValue`、`readOnly`、`theme`、`mode`、`toolbar`、CodeMirror `extensions` 和 `uploadImage`；ref 提供聚焦、读取正文、插入和定位行。多实例拥有独立正文、标题锚点和对话框；主题/视图切换保留编辑实例与选区。插入对话框通过 portal 隔离宿主表单。
+
+完整用法、状态契约和限制见 [组件 API](packages/editor/README.md)；安装与运行见 [独立消费示例](examples/react-consumer/README.md)。示例真实安装 tarball，没有源码 alias。React 为 peer dependency，独立示例确认只有一份 React；基础和公式 CSS 选择器限定在 `.markedit` 内，字体保留独立资源与 KaTeX 许可。
+
+验收：51 项测试通过；独立示例与原工作台构建通过；浏览器验证受控编辑、父组件重置、只读、主题/视图切换、表格插入、独立实例卸载重挂、公式图表和窄屏布局，并回归工作台保存、目录与刷新恢复。SSR 框架、完整浏览器/输入法矩阵和发布流程仍待 P5；主包较大与长文最终重渲染限制仍保留。
+
 ## 开发路线
 
 完整技术选型、原项目分析、阶段任务与验收条件见 [开发计划](docs/DEVELOPMENT_PLAN.md)。本次交付和已知限制见 [实施状态](docs/IMPLEMENTATION_STATUS.md)。
@@ -84,7 +102,7 @@ Markdown 导入限制 1 MB；工作台 JSON 备份导入限制 20 MB、1000 份�
 2. P1：可运行编辑闭环（已实现，验证范围见实施状态）。
 3. P2：IndexedDB 多文档、目录、版本恢复、跨标签冲突处理（已实现）。
 4. P3：公式、Mermaid、代码高亮、滚动同步、图片接口（已实现，性能限制见下文）。
-5. P4：抽取 React 组件包、API 文档与独立消费示例。
+5. P4：React 组件包、API 文档与独立 tarball 消费示例（已实现，未发布 npm）。
 6. P5：CI、跨浏览器验收、性能记录、演示部署与发布。
 
 ## 代码入口
@@ -93,8 +111,10 @@ Markdown 导入限制 1 MB；工作台 JSON 备份导入限制 20 MB、1000 份�
 - `src/hooks/useWorkspace.ts`：自动保存队列、切换与跨标签页状态。
 - `src/lib/documents.ts`：IndexedDB 事务、迁移、版本与备份。
 - `src/lib/headings.ts`：AST 目录提取及预览锚点。
-- `src/components/MarkdownEditor.tsx`：编辑引擎与格式命令。
-- `src/components/MarkdownPreview.tsx`：独立、安全默认值的渲染组件。
+- `packages/editor/src/components/MarkdownEditor.tsx`：公共编辑器 API 与状态契约。
+- `packages/editor/src/components/EditorInput.tsx`：CodeMirror、格式命令与图片插入。
+- `packages/editor/src/components/MarkdownPreview.tsx`：独立、安全默认值的渲染组件。
+- `src/components/MarkdownEditor.tsx` / `MarkdownPreview.tsx`：工作台适配层。
 - `src/lib/draft.ts`：草稿 schema、解析与文件名。
 
 ## 来源

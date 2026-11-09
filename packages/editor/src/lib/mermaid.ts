@@ -28,6 +28,8 @@ export function renderDiagram(source: string, isCanceled: () => boolean): Promis
     if (/%%\s*\{|^\s*---/.test(source)) throw new Error('图表内配置指令未启用，请仅填写图表语法');
     const container = document.createElement('div');
     container.className = 'mermaid-render-host';
+    container.style.cssText =
+      'position:fixed;left:-100000px;top:0;width:1200px;visibility:hidden;pointer-events:none';
     container.setAttribute('aria-hidden', 'true');
     document.body.append(container);
     try {
