@@ -9,9 +9,9 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
-    "mark-edit": "file:../../.benchmarks/mark-edit-0.1.0.tgz",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markedit": "file:../../.benchmarks/react-markedit-0.1.0.tgz"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

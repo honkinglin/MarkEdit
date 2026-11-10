@@ -1,4 +1,4 @@
-name: Publish mark-edit
+name: Publish react-markedit
 on:
   push:
     tags: ['v*']
@@ -34,7 +34,7 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           path: |
-            .benchmarks/mark-edit-*.tgz
+            .benchmarks/react-markedit-*.tgz
             .benchmarks/release-manifest.json
             .benchmarks/SHA256SUMS
       - uses: actions/upload-artifact@v4
@@ -82,4 +82,4 @@ jobs:
       - name: Create release
         run: |
           VERSION="${RELEASE_TAG#v}"
-          gh release create "$RELEASE_TAG" --verify-tag --title "mark-edit $VERSION" --notes-file "releases/$VERSION.md" .benchmarks/mark-edit-*.tgz .benchmarks/SHA256SUMS
+          gh release create "$RELEASE_TAG" --verify-tag --title "react-markedit $VERSION" --notes-file "releases/$VERSION.md" .benchmarks/react-markedit-*.tgz .benchmarks/SHA256SUMS

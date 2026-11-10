@@ -1,9 +1,9 @@
 import { messages } from './i18n';
 import { StrictMode, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MarkdownEditor, MarkdownPreview } from 'mark-edit';
-import type { EditorMode, EditorTheme, MarkdownEditorHandle } from 'mark-edit';
-import 'mark-edit/style.css';
+import { MarkdownEditor, MarkdownPreview } from 'react-markedit';
+import type { EditorMode, EditorTheme, MarkdownEditorHandle } from 'react-markedit';
+import 'react-markedit/style.css';
 import './style.css';
 const initial = messages.controlledExample;
 function App() {

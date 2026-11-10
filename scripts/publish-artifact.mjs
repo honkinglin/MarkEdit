@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 
 const manifest = JSON.parse(await readFile('.benchmarks/release-manifest.json', 'utf8'));
 // Validate the filename before reading a path supplied by the manifest.
-assert.match(manifest.filename, /^mark-edit-\d+\.\d+\.\d+\.tgz$/);
+assert.match(manifest.filename, /^react-markedit-\d+\.\d+\.\d+\.tgz$/);
 const file = `.benchmarks/${manifest.filename}`;
 verifyReleaseIntegrity(manifest, await readFile(file), {
   commit: process.env.GITHUB_SHA,

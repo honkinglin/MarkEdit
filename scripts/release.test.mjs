@@ -4,9 +4,9 @@ import { createHash } from 'node:crypto';
 import { verifyReleaseIntegrity } from './release-integrity.mjs';
 const data = Buffer.from('candidate tarball');
 const manifest = {
-  name: 'mark-edit',
+  name: 'react-markedit',
   version: '0.1.0',
-  filename: 'mark-edit-0.1.0.tgz',
+  filename: 'react-markedit-0.1.0.tgz',
   dirty: false,
   commit: 'abc',
   sha256: createHash('sha256').update(data).digest('hex'),

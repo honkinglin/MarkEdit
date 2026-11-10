@@ -6,7 +6,7 @@ import { packageArtifact } from './package-artifact.mjs';
 
 const artifact = await packageArtifact();
 const { pkg } = artifact;
-assert.equal(pkg.name, 'mark-edit');
+assert.equal(pkg.name, 'react-markedit');
 assert.notEqual(pkg.private, true, 'The library must be publishable.');
 assert.equal(pkg.license, 'MIT');
 assert.equal(pkg.repository.url, 'git+https://github.com/honkinglin/MarkEdit.git');

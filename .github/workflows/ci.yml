@@ -43,7 +43,7 @@ jobs:
             .benchmarks/report.json
             .benchmarks/release-report.json
             .benchmarks/third-party-notices.json
-            .benchmarks/mark-edit-*.tgz
+            .benchmarks/react-markedit-*.tgz
             .benchmarks/release-manifest.json
             .benchmarks/SHA256SUMS
           if-no-files-found: warn

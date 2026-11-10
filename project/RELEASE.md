@@ -1,6 +1,6 @@
 # Release guide
 
-The React package is `mark-edit`; the first version is `0.1.0`. The private root workspace is never published. The package is MIT-licensed and associated with `honkinglin/MarkEdit`. The verified npm account for the first release is `kyrielin`.
+The React package is `react-markedit`; the first version is `0.1.0`. The private root workspace is never published. The package is MIT-licensed and associated with `honkinglin/MarkEdit`. The verified npm account for the first release is `kyrielin`.
 
 ## Prepare an exact candidate
 

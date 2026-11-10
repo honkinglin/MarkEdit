@@ -1,4 +1,4 @@
-# mark-edit
+# react-markedit
 
 A React 19 and TypeScript Markdown editor with a standalone preview. Built on CodeMirror 6, with GFM, KaTeX, Mermaid, and on-demand syntax highlighting. Independent of the workspace, IndexedDB, and localStorage.
 
@@ -7,10 +7,10 @@ The package uses the MIT license and ships ESM, TypeScript declarations, and CSS
 ## Install
 
 ```bash
-npm install mark-edit react@^19 react-dom@^19
+npm install react-markedit react@^19 react-dom@^19
 ```
 
-Import `mark-edit/style.css` once in your application. For release status and version history, see [npm](https://www.npmjs.com/package/mark-edit) and [GitHub Releases](https://github.com/honkinglin/MarkEdit/releases).
+Import `react-markedit/style.css` once in your application. For release status and version history, see [npm](https://www.npmjs.com/package/react-markedit) and [GitHub Releases](https://github.com/honkinglin/MarkEdit/releases).
 
 ## Build from source
 
@@ -21,12 +21,12 @@ npm ci
 npm run pack:lib
 ```
 
-Install `.benchmarks/mark-edit-0.1.0.tgz` in another React 19 application, then import the styles explicitly:
+Install `.benchmarks/react-markedit-0.1.0.tgz` in another React 19 application, then import the styles explicitly:
 
 ```tsx
 import { useState } from 'react';
-import { MarkdownEditor } from 'mark-edit';
-import 'mark-edit/style.css';
+import { MarkdownEditor } from 'react-markedit';
+import 'react-markedit/style.css';
 
 export function WritingArea() {
   const [value, setValue] = useState('# Hello');
@@ -69,7 +69,7 @@ For content over 30,000 characters, preview updates are coalesced over 180 ms. S
 
 ```tsx
 import { useRef } from 'react';
-import { MarkdownEditor, type MarkdownEditorHandle } from 'mark-edit';
+import { MarkdownEditor, type MarkdownEditorHandle } from 'react-markedit';
 
 function Example() {
   const editor = useRef<MarkdownEditorHandle>(null);
@@ -98,7 +98,7 @@ CodeMirror extensions are trusted application code. Do not accept scripts from d
 ## MarkdownPreview
 
 ```tsx
-import { MarkdownPreview, getHeadings } from 'mark-edit';
+import { MarkdownPreview, getHeadings } from 'react-markedit';
 const prefix = 'article-a-';
 const headings = getHeadings('# Heading', prefix);
 // headings[0].id matches the rendered heading ID.
