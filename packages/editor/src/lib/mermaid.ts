@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import DOMPurify from 'dompurify';
 import mermaid from 'mermaid';
 mermaid.initialize({
@@ -24,8 +25,8 @@ let queue = Promise.resolve();
 export function renderDiagram(source: string, isCanceled: () => boolean): Promise<string> {
   const work = queue.then(async () => {
     if (isCanceled()) return '';
-    if (source.length > 50_000) throw new Error('图表超过 50,000 字符限制');
-    if (/%%\s*\{|^\s*---/.test(source)) throw new Error('图表内配置指令未启用，请仅填写图表语法');
+    if (source.length > 50_000) throw new Error(messages.diagramsMustNotExceed50000Characters);
+    if (/%%\s*\{|^\s*---/.test(source)) throw new Error(messages.diagramConfigurationDisabled);
     const container = document.createElement('div');
     container.className = 'mermaid-render-host';
     container.style.cssText =

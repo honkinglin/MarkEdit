@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MarkdownPreview } from './MarkdownPreview';
-describe('Markdown 预览', () => {
+describe('Markdown preview', () => {
   it('渲染 GFM 表格和任务列表', () => {
     const html = renderToStaticMarkup(
       <MarkdownPreview value={'| A | B |\n| --- | --- |\n| 1 | 2 |\n\n- [x] 完成'} />,
@@ -41,7 +41,7 @@ describe('扩展 Markdown 结构', () => {
         value={'```flow\na=>start: 开始\n```\n\n<iframe src="https://example.com"></iframe>'}
       />,
     );
-    expect(html).toContain('旧版 flow 语法暂不兼容');
+    expect(html).toContain('flow syntax is not supported');
     expect(html).not.toContain('<iframe');
   });
 });

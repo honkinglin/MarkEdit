@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -33,7 +34,7 @@ export function annotateHeadings(tree: Root, prefix = ''): Heading[] {
     node.data = { ...node.data, hProperties: { ...node.data?.hProperties, id } };
     headings.push({
       id,
-      text: text || '无标题',
+      text: text || messages.untitled,
       depth: node.depth,
       line: node.position?.start.line ?? 1,
     });

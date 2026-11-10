@@ -1,3 +1,4 @@
+import { messages } from '../../i18n';
 import { useEffect, useState } from 'react';
 export function MermaidBlock({ source }: { source: string }) {
   const [result, setResult] = useState<{ source: string; svg?: string; error?: string } | null>(
@@ -14,7 +15,10 @@ export function MermaidBlock({ source }: { source: string }) {
         })
         .catch((error: unknown) => {
           if (!canceled)
-            setResult({ source, error: error instanceof Error ? error.message : '图表加载失败' });
+            setResult({
+              source,
+              error: error instanceof Error ? error.message : messages.couldNotLoadDiagram,
+            });
         });
     }, 250);
     return () => {
@@ -27,19 +31,19 @@ export function MermaidBlock({ source }: { source: string }) {
     <div className="mermaid-block">
       {current?.error ? (
         <div className="render-error" role="status">
-          <strong>图表暂时无法渲染</strong>
+          <strong>{messages.couldNotRenderDiagram}</strong>
           <p>{current.error}</p>
           <pre>{source}</pre>
         </div>
       ) : current?.svg ? (
         <div
           role="img"
-          aria-label="Mermaid 图表"
+          aria-label={messages.mermaidDiagram}
           dangerouslySetInnerHTML={{ __html: current.svg }}
         />
       ) : (
         <div className="diagram-loading" role="status">
-          正在绘制图表…<pre>{source}</pre>
+          {messages.drawingDiagram} <pre>{source}</pre>
         </div>
       )}
     </div>

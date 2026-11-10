@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — English interface
+
+- English defaults across the workspace, reusable editor, insertion dialogs, accessibility labels, errors, and consumer example.
+- Centralized English message catalogs, localized counts, and new-document templates; existing content is preserved.
+- English READMEs and refreshed screenshots.
+- Case-insensitive command search and browser-language-independent defaults.
+- Package verification now follows shared JS chunks.
+- Added localization coverage; 53 unit tests and 28 browser tests pass.
+
 ## Unreleased — P5 发布准备
 
 - 采用 MIT 许可，组件 tarball 包含许可证；增加 Vercel 静态演示配置。

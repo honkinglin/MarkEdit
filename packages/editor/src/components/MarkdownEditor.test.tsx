@@ -80,7 +80,7 @@ describe('公共 React 编辑器契约', () => {
     await act(async () => first.current!.insertText('bad'));
     expect(first.current!.getValue()).toBe('safe');
     expect(view().state.readOnly).toBe(true);
-    expect(host.querySelector<HTMLButtonElement>('button[aria-label="加粗"]')!.disabled).toBe(true);
+    expect(host.querySelector<HTMLButtonElement>('button[aria-label="Bold"]')!.disabled).toBe(true);
     await act(async () => root.render(<MarkdownEditor ref={first} defaultValue="safe" />));
     await act(async () => first.current!.insertText('ok '));
     expect(first.current!.getValue()).toBe('ok safe');
@@ -118,8 +118,8 @@ describe('公共 React 编辑器契约', () => {
       root.render(<MarkdownEditor ref={first} defaultValue="new" toolbar={['bold', 'code']} />),
     );
     expect(first.current!.getValue()).toBe('new');
-    expect(host.querySelector('button[aria-label="链接"]')).toBeNull();
-    expect(host.querySelector('button[aria-label="代码块"]')).not.toBeNull();
+    expect(host.querySelector('button[aria-label="Link"]')).toBeNull();
+    expect(host.querySelector('button[aria-label="Code block"]')).not.toBeNull();
   });
   it('异步图片上传完成前切换只读，不插入迟到的内容', async () => {
     let finish!: (url: string) => void;
@@ -167,7 +167,7 @@ describe('公共 React 编辑器契约', () => {
       ),
     );
     await act(async () =>
-      host.querySelector<HTMLButtonElement>('button[aria-label="表格"]')!.click(),
+      host.querySelector<HTMLButtonElement>('button[aria-label="Table"]')!.click(),
     );
     const dialog = document.querySelector('dialog[open]')!;
     expect(dialog).not.toBeNull();
@@ -176,6 +176,6 @@ describe('公共 React 编辑器契约', () => {
       dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.click(),
     );
     expect(submit).not.toHaveBeenCalled();
-    expect(view().state.doc.toString()).toContain('| 标题 1 |');
+    expect(view().state.doc.toString()).toContain('| Heading 1 |');
   });
 });

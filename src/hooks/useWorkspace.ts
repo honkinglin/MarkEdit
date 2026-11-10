@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DRAFT_KEY } from '../lib/draft';
 import { ConflictError, openRepository } from '../lib/documents';
@@ -42,7 +43,7 @@ export function useWorkspace() {
     setError(
       reason instanceof ConflictError
         ? reason.message
-        : `操作失败，当前内容仍保留在编辑器中。请重试或导出备份。${reason instanceof Error ? `（${reason.message}）` : ''}`,
+        : messages.operationFailed(reason instanceof Error ? reason.message : ''),
     );
   }, []);
   const notify = useCallback(() => {
@@ -84,7 +85,7 @@ export function useWorkspace() {
         if (conflicted.current) throw new ConflictError();
         const doc = current.current;
         const repo = repository.current;
-        if (!repo) throw new Error('文档库尚未就绪');
+        if (!repo) throw new Error(messages.theDocumentLibraryIsNotReady);
         if (!doc || !dirty.current) return;
         saving.current = true;
         setStatus('saving');
@@ -192,7 +193,7 @@ export function useWorkspace() {
     try {
       if (!skipSave) await flush();
       else await tail.current;
-      if (!repository.current) throw new Error('文档库尚未就绪');
+      if (!repository.current) throw new Error(messages.theDocumentLibraryIsNotReady);
       await run(repository.current);
       await refresh();
       notify();
@@ -222,10 +223,10 @@ export function useWorkspace() {
     switchDocument: (id: string) =>
       action(async (repo) => {
         const doc = await repo.get(id);
-        if (!doc || doc.deletedAt !== null) throw new Error('文档已进入回收站');
+        if (!doc || doc.deletedAt !== null) throw new Error(messages.thisDocumentIsInTheTrash);
         select(doc);
       }),
-    create: (input: DocumentInput = { name: '未命名.md', content: '' }) =>
+    create: (input: DocumentInput = { name: messages.untitledMd, content: '' }) =>
       action(async (repo) => {
         select(await repo.create(input));
       }),
@@ -257,7 +258,7 @@ export function useWorkspace() {
         if (current.current)
           select(
             await repo.create({
-              name: `${current.current.name.replace(/\.md$/i, '')}（冲突副本）.md`,
+              name: messages.conflictFilename(current.current.name.replace(/\.md$/i, '')),
               content: current.current.content,
             }),
           );

@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { initialDraft, parseDraft } from './draft';
 
 export interface Snapshot {
@@ -19,7 +20,7 @@ export interface DocumentRecord {
 export type DocumentInput = Pick<DocumentRecord, 'name' | 'content'>;
 export class ConflictError extends Error {
   constructor() {
-    super('这份文档已在另一个标签页更新，请选择载入最新版本或另存副本。');
+    super(messages.documentConflict);
   }
 }
 export function newDocument(input: DocumentInput): DocumentRecord {
@@ -47,8 +48,8 @@ function request<T>(req: IDBRequest<T>): Promise<T> {
 function completed(tx: IDBTransaction) {
   return new Promise<void>((resolve, reject) => {
     tx.oncomplete = () => resolve();
-    tx.onabort = () => reject(tx.error ?? new Error('事务已取消'));
-    tx.onerror = () => reject(tx.error ?? new Error('存储写入失败'));
+    tx.onabort = () => reject(tx.error ?? new Error(messages.transactionCancelled));
+    tx.onerror = () => reject(tx.error ?? new Error(messages.couldNotWriteToStorage));
   });
 }
 export async function openRepository(name = 'markedit-workspace'): Promise<DocumentRepository> {
@@ -60,7 +61,7 @@ export async function openRepository(name = 'markedit-workspace'): Promise<Docum
   const db = await new Promise<IDBDatabase>((resolve, reject) => {
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
-    req.onblocked = () => reject(new Error('数据库升级被其他标签页阻塞，请关闭旧页面后重试。'));
+    req.onblocked = () => reject(new Error(messages.databaseBlocked));
   });
   db.onversionchange = () => db.close();
   return new DocumentRepository(db);
@@ -154,7 +155,7 @@ export class DocumentRepository {
     return this.change(doc.id, doc.revision, (current) => {
       if (current.deletedAt !== null) throw new ConflictError();
       const snapshot = current.snapshots.find((entry) => entry.id === snapshotId);
-      if (!snapshot) throw new Error('该版本已不存在，请刷新版本列表。');
+      if (!snapshot) throw new Error(messages.snapshotMissing);
       return {
         ...current,
         name: snapshot.name,
@@ -200,7 +201,7 @@ export function parseBackup(raw: string): DocumentRecord[] {
     !Array.isArray(data.documents) ||
     data.documents.length > 1000
   )
-    throw new Error('备份格式无效，或文档超过 1000 份。');
+    throw new Error(messages.invalidBackup);
   return data.documents.map((entry: unknown) => {
     if (
       !object(entry) ||
@@ -212,7 +213,7 @@ export function parseBackup(raw: string): DocumentRecord[] {
       !Array.isArray(entry.snapshots) ||
       entry.snapshots.length > 30
     )
-      throw new Error('备份中的文档数据无效，未导入任何文档。');
+      throw new Error(messages.invalidBackupDocument);
     const snapshots = entry.snapshots.map((snapshot: unknown): Snapshot => {
       if (
         !object(snapshot) ||
@@ -220,7 +221,7 @@ export function parseBackup(raw: string): DocumentRecord[] {
         !text(snapshot.content) ||
         !time(snapshot.createdAt)
       )
-        throw new Error('备份中的版本数据无效。');
+        throw new Error(messages.invalidVersionDataInBackup);
       return {
         id: crypto.randomUUID(),
         name: snapshot.name,

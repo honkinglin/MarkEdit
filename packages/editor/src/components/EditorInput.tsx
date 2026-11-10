@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import CodeMirror, { ExternalChange } from '@uiw/react-codemirror';
@@ -13,41 +14,55 @@ import type { UploadImage } from '../lib/insertions';
 
 const noExtensions: Extension[] = [];
 const formats = [
-  { id: 'bold', label: '加粗', icon: Bold, before: '**', after: '**', placeholder: '粗体文字' },
-  { id: 'italic', label: '斜体', icon: Italic, before: '*', after: '*', placeholder: '斜体文字' },
+  {
+    id: 'bold',
+    label: messages.bold,
+    icon: Bold,
+    before: '**',
+    after: '**',
+    placeholder: messages.boldText,
+  },
+  {
+    id: 'italic',
+    label: messages.italic,
+    icon: Italic,
+    before: '*',
+    after: '*',
+    placeholder: messages.italicText,
+  },
   {
     id: 'heading',
-    label: '标题',
+    label: messages.heading,
     icon: Heading2,
     before: '## ',
     after: '',
-    placeholder: '标题',
+    placeholder: messages.heading,
     block: true,
   },
   {
     id: 'quote',
-    label: '引用',
+    label: messages.quote,
     icon: Quote,
     before: '> ',
     after: '',
-    placeholder: '引用内容',
+    placeholder: messages.quotedText,
     block: true,
   },
   {
     id: 'list',
-    label: '列表',
+    label: messages.list,
     icon: List,
     before: '- ',
     after: '',
-    placeholder: '列表项目',
+    placeholder: messages.listItem,
     block: true,
   },
 ];
 const dialogs = [
-  { kind: 'link', label: '链接', icon: Link },
-  { kind: 'image', label: '图片', icon: ImagePlus },
-  { kind: 'code', label: '代码块', icon: Code2 },
-  { kind: 'table', label: '表格', icon: Table2 },
+  { kind: 'link', label: messages.link, icon: Link },
+  { kind: 'image', label: messages.image, icon: ImagePlus },
+  { kind: 'code', label: messages.codeBlock, icon: Code2 },
+  { kind: 'table', label: messages.table, icon: Table2 },
 ] as const;
 export interface EditorInputHandle {
   focus: () => void;
@@ -67,7 +82,7 @@ export function EditorInput({
   uploadImage,
   toolbar = true,
   extensions: extraExtensions = noExtensions,
-  ariaLabel = 'Markdown 源码',
+  ariaLabel = messages.markdownSource,
   portalDialogs = false,
 }: {
   value: string;
@@ -166,12 +181,12 @@ export function EditorInput({
 
   async function insertFile(file: File, editor: EditorView, position: number) {
     if (!uploadImage) {
-      setNotice('当前工作台支持图片 URL；点击图片按钮输入地址。');
+      setNotice(messages.imageUrlHint);
       return;
     }
     const bookmark = { position };
     uploads.current.add(bookmark);
-    setNotice('正在上传图片…');
+    setNotice(messages.uploadingImage);
     try {
       const text = await imageFromFile(file, uploadImage);
       if (!mounted.current || view.current !== editor || locked.current) return;
@@ -179,10 +194,12 @@ export function EditorInput({
         changes: { from: bookmark.position, insert: `\n${text}\n` },
         userEvent: 'input',
       });
-      setNotice('图片已插入');
+      setNotice(messages.imageInserted);
     } catch (error) {
       if (mounted.current)
-        setNotice(error instanceof Error ? error.message : '图片上传失败，请重试');
+        setNotice(
+          error instanceof Error ? error.message : messages.imageUploadFailedPleaseTryAgain,
+        );
     } finally {
       uploads.current.delete(bookmark);
     }
@@ -265,9 +282,9 @@ export function EditorInput({
     });
   }
   return (
-    <section className="source-pane" aria-label="编辑区域">
+    <section className="source-pane" aria-label={messages.editingArea}>
       {toolbar !== false && (
-        <div className="format-toolbar" role="group" aria-label="文本格式">
+        <div className="format-toolbar" role="group" aria-label={messages.textFormatting}>
           {formats
             .filter(
               (item) =>
@@ -314,7 +331,11 @@ export function EditorInput({
       {notice && (
         <div className="editor-notice" role="status">
           {notice}
-          <button type="button" onClick={() => setNotice('')} aria-label="关闭图片提示">
+          <button
+            type="button"
+            onClick={() => setNotice('')}
+            aria-label={messages.dismissImageNotice}
+          >
             ×
           </button>
         </div>

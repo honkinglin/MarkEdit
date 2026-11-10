@@ -1,19 +1,19 @@
 # @markedit/react
 
-React 19 + TypeScript Markdown 编辑器与独立预览组件。基于 CodeMirror 6，支持 GFM、KaTeX、Mermaid 和按需代码高亮。实现不依赖工作台、IndexedDB 或 localStorage。
+A React 19 and TypeScript Markdown editor with a standalone preview. Built on CodeMirror 6, with GFM, KaTeX, Mermaid, and on-demand syntax highlighting. Independent of the workspace, IndexedDB, and localStorage.
 
-当前为本地打包验证版本，`private: true`，尚未发布 npm。采用 MIT 许可；正式 npm 包名和发布账号仍待确认。只输出 ESM 与 TypeScript 声明；需要支持 CSS 和动态 import 的打包器。交互组件面向浏览器；Next.js 等环境需在客户端边界使用，未完成 SSR 框架兼容验收。
+The package is currently private and has not been published to npm. It uses the MIT license and ships ESM, TypeScript declarations, and CSS. A bundler with CSS and dynamic import support is required. Interactive components target browsers; SSR framework integrations have not been validated.
 
-## 安装本地构建
+## Install a local build
 
-在仓库根目录运行：
+From the repository root:
 
 ```bash
 npm ci
 npm run pack:lib
 ```
 
-在另一个 React 19 项目中安装 `.benchmarks/markedit-react-0.1.0.tgz`，然后显式导入样式：
+Install `.benchmarks/markedit-react-0.1.0.tgz` in another React 19 application, then import the styles explicitly:
 
 ```tsx
 import { useState } from 'react';
@@ -26,38 +26,38 @@ export function WritingArea() {
 }
 ```
 
-仓库自带真实消费 tarball 的独立示例：根目录运行 `npm run example:setup`，然后 `npm run example:dev`。`npm run example:build` 检查示例类型和生产构建。示例有独立 package-lock，不属于 workspace，不通过 alias 引用源码。
+Run `npm run example:setup` and `npm run example:dev` from the root for an independent consumer application. `npm run example:build` checks its types and production build. The example installs the tarball with its own dependency tree, without source aliases.
 
 ## MarkdownEditor
 
-| 属性                 | 类型 / 默认值                                | 说明                                                                 |
-| -------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
-| `value`              | `string`                                     | 受控正文，与 `defaultValue` 互斥；必须传入 `onChange`                |
-| `defaultValue`       | `string` / `''`                              | 非受控初值，仅首次挂载读取                                           |
-| `onChange`           | `(value: string) => void`                    | 用户编辑、工具栏和 ref 插入产生的内容变化；外部 prop 更新不触发      |
-| `readOnly`           | `boolean` / `false`                          | 禁止用户编辑、工具栏、ref 插入及迟到的上传插入；仍可选取、复制和预览 |
-| `theme`              | `'light' \| 'dark'` / `'light'`              | 每个实例独立主题，动态切换保留选区与编辑实例                         |
-| `mode`               | `'edit' \| 'split' \| 'preview'` / `'split'` | 隐藏面板保留编辑器与撤销历史                                         |
-| `toolbar`            | `boolean \| readonly ToolbarItem[]` / `true` | `false` 隐藏；数组选择内置按钮，按内置顺序显示                       |
-| `extensions`         | CodeMirror `Extension[]`                     | 可信宿主提供的编辑器扩展；建议保持数组引用稳定                       |
-| `uploadImage`        | `(file: File) => Promise<string>`            | 粘贴/拖拽图片上传，返回 HTTP(S) URL                                  |
-| `syncScroll`         | `boolean` / `true`                           | 分屏时启用基于源码行的双向滚动                                       |
-| `height`             | CSS height / `480`                           | 数字为 px，也可用 CSS 字符串                                         |
-| `className`, `style` | 标准 React 属性                              | 应用在组件根节点，`style.height` 可覆盖 `height`                     |
-| `ariaLabel`          | `string` / `'Markdown 源码'`                 | 源码输入框名称，建议多实例使用不同名称                               |
-| `ref`                | `Ref<MarkdownEditorHandle>`                  | 下列实例命令                                                         |
+| Prop                 | Type / default                               | Description                                                                                                                     |
+| -------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `value`              | `string`                                     | Controlled content; requires `onChange` and excludes `defaultValue`.                                                            |
+| `defaultValue`       | `string` / `''`                              | Initial uncontrolled content, read only on mount.                                                                               |
+| `onChange`           | `(value: string) => void`                    | Changes from editing, toolbar actions, or ref insertion. External prop updates do not trigger it.                               |
+| `readOnly`           | `boolean` / `false`                          | Blocks editing, toolbar changes, ref insertion, and pending upload insertion. Selection, copying, and preview remain available. |
+| `theme`              | `'light' \| 'dark'` / `'light'`              | Per-instance theme; switching preserves the editor and selection.                                                               |
+| `mode`               | `'edit' \| 'split' \| 'preview'` / `'split'` | Hidden panes preserve editor state and undo history.                                                                            |
+| `toolbar`            | `boolean \| readonly ToolbarItem[]` / `true` | Hide the toolbar or choose built-in items in their standard order.                                                              |
+| `extensions`         | CodeMirror `Extension[]`                     | Trusted host extensions. Keep the array reference stable.                                                                       |
+| `uploadImage`        | `(file: File) => Promise<string>`            | Upload pasted or dropped images and return an HTTP(S) URL.                                                                      |
+| `syncScroll`         | `boolean` / `true`                           | Synchronize split panes by source line position.                                                                                |
+| `height`             | CSS height / `480`                           | Numbers represent pixels; CSS strings are also accepted.                                                                        |
+| `className`, `style` | React attributes                             | Applied to the component root. `style.height` can override `height`.                                                            |
+| `ariaLabel`          | `string` / `'Markdown source'`               | Accessible source input name; use distinct labels for multiple instances.                                                       |
+| `ref`                | `Ref<MarkdownEditorHandle>`                  | Imperative commands described below.                                                                                            |
 
-`ToolbarItem`：`bold`、`italic`、`heading`、`quote`、`list`、`link`、`image`、`code`、`table`。
+`ToolbarItem`: `bold`, `italic`, `heading`, `quote`, `list`, `link`, `image`, `code`, `table`.
 
-### 状态契约
+### State contract
 
-受控模式以 `value` 为唯一事实来源。`onChange` 内应同步更新 React state；可以异步保存，但不要延迟回传 `value`。如果父组件拒绝变化，编辑器会恢复原 `value`。外部重置正文不会回调 `onChange`。不要在同一次挂载中切换受控/非受控模式。
+Controlled mode uses `value` as the source of truth. Update React state synchronously in `onChange`; persistence may be asynchronous. If the parent rejects a change, the editor restores `value`. External resets do not trigger `onChange`. Do not switch between controlled and uncontrolled modes within one mount.
 
-非受控模式由组件维护正文，后续改变 `defaultValue` 不会重置。切换到另一份文档时使用不同的 `key`，以同时重置正文、选区、撤销历史和待完成上传。主题、工具栏和视图变化不会重建编辑器。此组件不自动保存，卸载非受控实例后其内容会丢失。
+In uncontrolled mode, later `defaultValue` changes do not reset content. Use a different React `key` when switching documents to reset content, selection, history, and pending uploads together. Theme, toolbar, and view changes do not recreate the editor. The component does not autosave; unmounting an uncontrolled instance discards its content.
 
-超过 30,000 字符的预览合并 180ms 内的更新，源码与 `onChange` 不等待预览；大文档完整重渲染仍可能占用主线程。
+For content over 30,000 characters, preview updates are coalesced over 180 ms. Source editing and `onChange` do not wait for the preview, though a complete preview render can still occupy the main thread.
 
-### Ref 命令
+### Ref commands
 
 ```tsx
 import { useRef } from 'react';
@@ -67,46 +67,50 @@ function Example() {
   const editor = useRef<MarkdownEditorHandle>(null);
   return (
     <>
-      <button onClick={() => editor.current?.insertText('**hello**')}>插入</button>
-      <MarkdownEditor ref={editor} defaultValue="# 初稿" />
+      <button onClick={() => editor.current?.insertText('**hello**')}>Insert</button>
+      <MarkdownEditor ref={editor} defaultValue="# First draft" />
     </>
   );
 }
 ```
 
-- `focus()`：聚焦源码输入框；纯预览模式需要先切回编辑或分屏才能显示焦点。
-- `getValue()`：读取最近一次 React 提交的正文；在 `onChange` 内需要最新内容时直接使用回调参数。
-- `insertText(text)`：替换当前选区，可撤销；受控模式需由父组件接受更新；只读时无操作。
-- `jumpToLine(line)`：一开始计数，截取整数并限制到有效行，非有限数字忽略；定位并聚焦源码。
+- `focus()`: focus the source input. Switch out of preview-only mode to make it visible.
+- `getValue()`: read content from the latest React commit. Inside `onChange`, use its argument for the newest value.
+- `insertText(text)`: replace the selection in an undoable transaction. Controlled parents must accept the change. No effect in read-only mode.
+- `jumpToLine(line)`: jump to a one-based line and focus the source. Values are truncated and clamped; non-finite values are ignored.
 
-### 图片与扩展
+### Images and extensions
 
-上传回调由宿主负责鉴权、网络请求与存储。本包仅校验 PNG/JPEG/GIF/WebP、最大 5 MB，以及返回 URL；没有上传回调时提示使用图片 URL。上传失败显示局部提示，卸载或完成前切换只读不会插入；不主动取消宿主网络请求。
+The host owns upload authentication, networking, and storage. The package validates PNG/JPEG/GIF/WebP, a 5 MB size limit, and the returned URL. Without a callback, the editor suggests inserting an image URL. Upload errors appear locally. Unmounting or enabling read-only mode before completion prevents insertion; the host request is not automatically cancelled.
 
-`extensions` 使用 CodeMirror 6 的扩展模型。扩展属于可信应用代码，能改变编辑行为；不要接收文档作者提供的任意脚本。使用宿主自定义扩展时保证 `@codemirror/state` 只有一个兼容实例。
+CodeMirror extensions are trusted application code. Do not accept scripts from document authors. Ensure host extensions use one compatible instance of `@codemirror/state`.
 
 ## MarkdownPreview
 
 ```tsx
 import { MarkdownPreview, getHeadings } from '@markedit/react';
 const prefix = 'article-a-';
-const headings = getHeadings('# 标题', prefix);
-// headings[0].id 对应预览中标题 ID
-<MarkdownPreview value="# 标题" headingPrefix={prefix} theme="light" />;
+const headings = getHeadings('# Heading', prefix);
+// headings[0].id matches the rendered heading ID.
+<MarkdownPreview value="# Heading" headingPrefix={prefix} theme="light" />;
 ```
 
-属性：必填 `value: string`；可选 `theme`、`className`、`style`、`headingPrefix`。默认每个预览通过 React `useId` 生成独立标题前缀；自定义前缀需由宿主保证唯一。`getHeadings(value, prefix = '')` 返回 `{ id, text, depth, line }[]`，不会读取 DOM。工作台兼容层保留原有空前缀目录行为。
+Required prop: `value: string`. Optional props: `theme`, `className`, `style`, and `headingPrefix`. By default, each preview generates its own prefix with React `useId`; hosts must keep custom prefixes unique. `getHeadings(value, prefix = '')` returns `{ id, text, depth, line }[]` without reading the DOM.
 
-## 样式与打包边界
+## Language
 
-- 基础 CSS 与公式 CSS 的选择器均限定在 `.markedit` 内；没有页面级 `body`、`:root` 或通用按钮重置。KaTeX 字体保留标准字体名，以独立资源提供。
-- 可通过 `.markedit` 下的 CSS 变量调整 `--bg`、`--text`、`--muted`、`--line`、`--accent` 等；宿主全局样式仍可能影响组件，不提供 Shadow DOM 隔离。
-- React 和 React DOM 为 peerDependencies；包本身不内联 React。其余依赖保留为 ESM imports，最终大小取决于宿主打包器。
-- KaTeX、Mermaid、语言高亮通过动态 import 加载；字体和公式 CSS 跟随公式模块。首次使用仍需下载相应资源，不保证离线可用。
-- 生产消费者仍有大 chunk 警告；库入口较小不代表包含第三方依赖后的应用体积较小。
+English is the default and currently the only supported interface language, including accessible names, dialogs, notifications, and inserted placeholders. Browser language does not change it. Document content is never translated. UI copy is centralized in `src/i18n`; a per-instance locale API can be added when another locale is supported. CodeMirror's built-in controls already use English by default.
 
-## 安全与兼容
+## Styling and packaging
 
-默认忽略原始 HTML。公式采用 `trust: false` 并限制展开；图表使用 strict、禁用文档内配置，SVG 经过清理。错误公式/图表只影响对应区块。外部图片会由浏览器请求，宿主需自行提供网络隐私策略。
+- Base and formula CSS selectors are scoped to `.markedit`; there are no page-level resets. KaTeX fonts retain standard font names and ship as separate assets.
+- Customize `--bg`, `--text`, `--muted`, `--line`, and `--accent` under `.markedit`. Host global styles may still affect components; there is no Shadow DOM isolation.
+- React and React DOM are peer dependencies. Other dependencies remain ESM imports, so final bundle size depends on the host bundler.
+- KaTeX, Mermaid, and highlighting use dynamic imports. Formula CSS and fonts load with the math module. First use requires downloading assets; offline availability is not guaranteed.
+- Production consumers may see large-chunk warnings. A small library entry does not represent the size of all dependencies.
 
-组件通过 React props/ref 管理正文、工具栏和编辑命令；图表使用 Mermaid，目录由 `getHeadings` 提取。非标准 `flow` / `seq` 和 `[TOC]` 指令不在支持范围内。
+## Safety and compatibility
+
+Raw HTML is ignored. Math uses `trust: false` and expansion limits. Diagrams use strict mode, disable inline configuration, and sanitize SVG. Rendering failures affect individual blocks. External images are requested by the browser; hosts should define their own network privacy policy.
+
+Nonstandard `flow`, `seq`, and `[TOC]` directives are not supported. Use Mermaid diagrams and `getHeadings` for an outline.

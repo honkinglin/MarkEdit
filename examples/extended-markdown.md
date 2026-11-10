@@ -1,32 +1,32 @@
-# Markdown，让表达更完整
+# More ways to express your ideas
 
-## 数学公式
+## Math
 
-行内公式：$E = mc^2$。
+An inline formula: $E = mc^2$.
 
 $$
 \int_0^1 x^2 \, dx = \frac{1}{3}
 $$
 
-## 流程图
+## Flowchart
 
 ```mermaid
 flowchart LR
-  A[记录想法] --> B[整理结构]
-  B --> C[发布作品]
+  A[Capture ideas] --> B[Organize thoughts]
+  B --> C[Publish your work]
 ```
 
-## 时序图
+## Sequence diagram
 
 ```mermaid
 sequenceDiagram
-  participant Writer as 写作者
-  participant Editor as 编辑器
-  Writer->>Editor: 输入 Markdown
-  Editor-->>Writer: 实时预览
+  participant Writer
+  participant Editor
+  Writer->>Editor: Write Markdown
+  Editor-->>Writer: Show live preview
 ```
 
-## 代码高亮
+## Syntax highlighting
 
 ```typescript
 interface Note {
@@ -35,14 +35,14 @@ interface Note {
 const note: Note = { title: 'Hello, MarkEdit' };
 ```
 
-## 表格
+## Tables
 
-| 能力         | 状态 |
-| ------------ | ---- |
-| 数学公式     | 可用 |
-| Mermaid 图表 | 可用 |
-| 代码高亮     | 可用 |
+| Capability          | Status    |
+| ------------------- | --------- |
+| Math formulas       | Available |
+| Mermaid diagrams    | Available |
+| Syntax highlighting | Available |
 
-## 图片
+## Images
 
-使用工具栏的图片面板输入 HTTP(S) 图片地址。组件使用者可以传入 `uploadImage(file)` 接入自己的上传服务。
+Use the image dialog in the toolbar to enter an HTTP(S) image URL. Applications embedding the component can supply `uploadImage(file)` to connect their own upload service.

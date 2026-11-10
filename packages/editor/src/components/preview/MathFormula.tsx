@@ -1,3 +1,4 @@
+import { messages } from '../../i18n';
 import { useEffect, useState } from 'react';
 export function MathFormula({ source, display }: { source: string; display: boolean }) {
   const [result, setResult] = useState<{ key: string; html?: string; error?: string } | null>(null);
@@ -11,7 +12,10 @@ export function MathFormula({ source, display }: { source: string; display: bool
       })
       .catch((error: unknown) => {
         if (!canceled)
-          setResult({ key, error: error instanceof Error ? error.message : '公式加载失败' });
+          setResult({
+            key,
+            error: error instanceof Error ? error.message : messages.couldNotLoadFormula,
+          });
       });
     return () => {
       canceled = true;
@@ -21,7 +25,7 @@ export function MathFormula({ source, display }: { source: string; display: bool
   if (current?.error)
     return (
       <span className="render-error" role="status" title={current.error}>
-        公式无法渲染：<code>{source}</code>
+        {messages.couldNotRenderFormula} <code>{source}</code>
       </span>
     );
   return current?.html ? (

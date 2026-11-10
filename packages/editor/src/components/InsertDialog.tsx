@@ -1,9 +1,15 @@
+import { messages } from '../i18n';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { fencedCode, linkMarkdown, tableMarkdown } from '../lib/insertions';
 export type InsertKind = 'link' | 'image' | 'table' | 'code';
-const titles = { link: '插入链接', image: '插入图片', table: '插入表格', code: '插入代码块' };
+const titles = {
+  link: messages.insertLink,
+  image: messages.insertImage,
+  table: messages.insertTable,
+  code: messages.insertCodeBlock,
+};
 export function InsertDialog({
   kind,
   portal = false,
@@ -45,8 +51,8 @@ export function InsertDialog({
       onCancel={onClose}
     >
       <div className="dialog-heading">
-        <h2 id={titleId}>{kind ? titles[kind] : '插入内容'}</h2>
-        <button type="button" aria-label="关闭插入面板" onClick={onClose}>
+        <h2 id={titleId}>{kind ? titles[kind] : messages.insertContent}</h2>
+        <button type="button" aria-label={messages.closeInsertPanel} onClick={onClose}>
           <X size={18} />
         </button>
       </div>
@@ -65,22 +71,22 @@ export function InsertDialog({
             onInsert(text, kind === 'table' || kind === 'code' || kind === 'image');
             onClose();
           } catch (reason) {
-            setError(reason instanceof Error ? reason.message : '无法插入');
+            setError(reason instanceof Error ? reason.message : messages.couldNotInsertContent);
           }
         }}
       >
         {(kind === 'link' || kind === 'image') && (
           <>
             <label>
-              {kind === 'image' ? '图片描述' : '链接文字'}
+              {kind === 'image' ? messages.imageDescription : messages.linkText}
               <input
-                aria-label={kind === 'image' ? '图片描述' : '链接文字'}
+                aria-label={kind === 'image' ? messages.imageDescription : messages.linkText}
                 value={label}
                 onChange={(event) => setLabel(event.target.value)}
               />
             </label>
             <label>
-              {kind === 'image' ? '图片地址' : '链接地址'}
+              {kind === 'image' ? messages.imageURL : messages.linkURL}
               <input
                 type="url"
                 required
@@ -89,15 +95,13 @@ export function InsertDialog({
                 onChange={(event) => setUrl(event.target.value)}
               />
             </label>
-            {kind === 'image' && (
-              <p className="empty-hint">通过图片 URL 插入。查看预览时，浏览器会请求该图片地址。</p>
-            )}
+            {kind === 'image' && <p className="empty-hint">{messages.imagePrivacyNotice}</p>}
           </>
         )}
         {kind === 'table' && (
           <div className="table-dimensions">
             <label>
-              数据行数
+              {messages.dataRows}{' '}
               <input
                 type="number"
                 required
@@ -108,7 +112,7 @@ export function InsertDialog({
               />
             </label>
             <label>
-              列数
+              {messages.columns}{' '}
               <input
                 type="number"
                 required
@@ -123,7 +127,7 @@ export function InsertDialog({
         {kind === 'code' && (
           <>
             <label>
-              代码语言
+              {messages.codeLanguage}{' '}
               <select value={language} onChange={(event) => setLanguage(event.target.value)}>
                 {[
                   'typescript',
@@ -145,7 +149,7 @@ export function InsertDialog({
               </select>
             </label>
             <label>
-              代码内容
+              {messages.codeContent}{' '}
               <textarea rows={8} value={code} onChange={(event) => setCode(event.target.value)} />
             </label>
           </>
@@ -157,10 +161,10 @@ export function InsertDialog({
         )}
         <div className="dialog-actions">
           <button type="button" onClick={onClose}>
-            取消
+            {messages.cancel}
           </button>
           <button className="export-button" type="submit">
-            插入
+            {messages.insert}
           </button>
         </div>
       </form>

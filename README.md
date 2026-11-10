@@ -2,51 +2,51 @@
 
 # MarkEdit
 
-**让写作保持专注，让 Markdown 拥有完整工作流。**
+**A focused space for writing. A complete workflow for Markdown.**
 
-本地优先的 Markdown 工作台 · 可组合的 React 编辑器
+Local-first Markdown workspace · Composable React editor
 
 [![CI](https://github.com/honkinglin/MarkEdit/actions/workflows/ci.yml/badge.svg)](https://github.com/honkinglin/MarkEdit/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-166534.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](packages/editor/README.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](tsconfig.json)
 
-[在线体验](https://markedit-seven.vercel.app) · [快速开始](#快速开始) · [React 组件](#react-组件) · [架构设计](project/ARCHITECTURE.md) · [参与贡献](CONTRIBUTING.md)
+[Live demo](https://markedit-seven.vercel.app) · [Quick start](#quick-start) · [React components](#react-components) · [Architecture](project/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
-![MarkEdit 工作台：文档导航、源码编辑与实时预览](assets/workbench.png)
+![MarkEdit workspace with document navigation, source editing, and live preview](assets/workbench.png)
 
-MarkEdit 将写作、预览、文档管理与版本恢复放在同一个工作台。无需注册，也无需配置后端，就能撰写技术笔记、维护 README，或整理带有公式与图表的长文。
+MarkEdit brings writing, previewing, document management, and version recovery into one workspace. No account or backend setup is required. Write technical notes, maintain a README, or organize documents with formulas and diagrams.
 
-它同时提供独立的 React 编辑器与预览组件：从个人写作空间到应用内的 Markdown 输入区域，复用同一套编辑能力。
+The same editing capabilities are available as standalone React editor and preview components, ready to embed in your own application.
 
-## 为认真写作而设计
+## Built for thoughtful writing
 
-| 能力           | 体验                                                                               |
-| -------------- | ---------------------------------------------------------------------------------- |
-| **专注编辑**   | CodeMirror 6、格式工具栏、搜索替换、撤销重做；编辑、分屏、预览与专注模式自由切换。 |
-| **表达完整**   | GFM 表格与任务列表、KaTeX 数学公式、Mermaid 图表、按需代码高亮。                   |
-| **文档有序**   | 多文档管理、搜索、自动保存、回收站、版本快照与跨标签页同步。                       |
-| **长文导航**   | 自动提取标题目录、唯一锚点、源码与预览标题跳转、双向滚动同步。                     |
-| **数据可迁移** | Markdown 导入导出、工作区备份与恢复；备份导入创建独立副本。                        |
-| **操作顺手**   | 命令菜单、键盘快捷键、深浅主题、可调分屏与窄屏布局。                               |
+| Capability               | What you get                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| **Focused editing**      | CodeMirror 6, formatting tools, search and replace, undo and redo, and edit, split, preview, and focus modes. |
+| **Rich expression**      | GFM tables and task lists, KaTeX formulas, Mermaid diagrams, and on-demand syntax highlighting.               |
+| **Organized documents**  | Multiple documents, search, autosave, trash, version snapshots, and cross-tab synchronization.                |
+| **Long-form navigation** | A heading outline, unique anchors, source and preview navigation, and synchronized scrolling.                 |
+| **Portable content**     | Markdown import and export, workspace backups, and restoration as independent copies.                         |
+| **Everyday comfort**     | A command menu, keyboard shortcuts, light and dark themes, adjustable panes, and responsive layouts.          |
 
-### 内容留在你的浏览器
+### Your documents stay in your browser
 
-工作台使用 IndexedDB 保存文档，无需账号或服务端存储。版本快照、回收站与可导出的备份，共同支持日常恢复和迁移。
+MarkEdit stores documents in IndexedDB. Version snapshots, recoverable trash, and exportable backups help you recover and move your work.
 
-文档不会自动同步到云端；清除站点数据会删除本地内容，请定期导出备份。正文中的外部图片仍会请求对应图片服务。
+There is no automatic cloud sync. Clearing site data deletes local documents, so export backups regularly. External images in your documents still send requests to their image hosts.
 
-### 文字、代码、公式和图表，一起写
+### Words, code, formulas, and diagrams
 
-用 `$E=mc^2$` 写行内公式，用 `$$` 写块级公式，用 `mermaid` 围栏代码块表达流程与关系。代码高亮覆盖 JavaScript、TypeScript、Python、JSON、CSS、HTML/XML、Bash、SQL 和 Markdown。
+Use `$E=mc^2$` for inline math, `$$` for display math, and a `mermaid` fenced code block for diagrams. Syntax highlighting supports JavaScript, TypeScript, Python, JSON, CSS, HTML/XML, Bash, SQL, and Markdown.
 
-直接导入[扩展语法示例](examples/extended-markdown.md)即可体验。原始 HTML 默认不渲染，图表使用受限配置并清理 SVG；单个图表出错时就地显示提示，正文继续可读。
+Try the [extended Markdown sample](examples/extended-markdown.md). Raw HTML is disabled by default. Diagrams use restricted configuration and sanitized SVG; a rendering failure stays local to the affected diagram.
 
-## 快速开始
+## Quick start
 
-需要 **Node.js 24** 和 npm。
+Requires **Node.js 24** and npm.
 
 ```bash
 git clone https://github.com/honkinglin/MarkEdit.git
@@ -55,19 +55,19 @@ npm ci
 npm run dev
 ```
 
-打开终端显示的本地地址，开始写作。生产构建使用 `npm run build`，静态产物输出到 `dist/`。
+Open the local URL printed in your terminal. Use `npm run build` for a production build; static assets are written to `dist/`.
 
-| 快捷键         | 操作                       |
-| -------------- | -------------------------- |
-| `⌘ / Ctrl + K` | 打开命令菜单               |
-| `⌘ / Ctrl + S` | 保存当前文档               |
-| `Esc`          | 关闭命令菜单或退出专注模式 |
+| Shortcut       | Action                                     |
+| -------------- | ------------------------------------------ |
+| `⌘ / Ctrl + K` | Open the command menu                      |
+| `⌘ / Ctrl + S` | Save the current document                  |
+| `Esc`          | Close the command menu or leave focus mode |
 
-Markdown 文件导入上限为 1 MB；工作区备份上限为 20 MB、1000 篇文档。备份包含历史版本和回收站内容。
+Markdown imports are limited to 1 MB. Workspace backups are limited to 20 MB and 1,000 documents, including trash and version history.
 
-## React 组件
+## React components
 
-将编辑器嵌入自己的产品，或者单独使用预览组件。组件不依赖工作台的文档仓库，也不接管宿主应用的数据持久化。
+Embed the editor in your product or render Markdown with the standalone preview. Components do not depend on the workspace document store and do not take ownership of application persistence.
 
 ```tsx
 import { useState } from 'react';
@@ -81,53 +81,59 @@ export function WritingArea() {
 }
 ```
 
-**受控 / 非受控 · 独立预览 · 只读模式 · 实例级主题 · 工具栏配置 · CodeMirror 扩展 · 图片上传回调 · ref 命令**
+**Controlled and uncontrolled state · Standalone preview · Read-only mode · Per-instance themes · Configurable toolbar · CodeMirror extensions · Image upload callback · Ref commands**
 
-![React 组件示例：受控编辑器、独立实例与预览](assets/react-components.png)
+![React components: controlled editor, independent instance, and standalone preview](assets/react-components.png)
 
-组件包尚未发布 npm。目前可从仓库构建 tarball，或运行使用真实安装包的独立示例：
+The component package is not yet published to npm. Build it locally or run the independent example, which installs the actual package tarball:
 
 ```bash
 npm run example:setup
 npm run example:dev
 ```
 
-`example:setup` 会构建组件包并安装到示例项目。在其他 React 19 项目中，可安装生成的 `.benchmarks/markedit-react-0.1.0.tgz`。
+To use it in another React 19 application, install the generated `.benchmarks/markedit-react-0.1.0.tgz`.
 
-查看[完整 API 与接入指南](packages/editor/README.md)，了解状态契约、扩展接口、样式导入与浏览器边界。图片上传由宿主应用通过 `uploadImage` 实现。
+Read the [API and integration guide](packages/editor/README.md) for state contracts, extension points, styles, and browser requirements. The host application supplies image uploads through `uploadImage`.
 
-## 工程设计
+## Language support
 
-- **清晰的模块边界：** 工作台负责文档生命周期，编辑器负责编辑事务，预览负责 Markdown 渲染；可复用组件独立打包。
-- **稳定的组件契约：** TypeScript strict、显式 React peer dependencies、ESM 与类型声明、限定作用域的样式。
-- **按需加载扩展：** 公式、图表与代码高亮拆分加载；大文档预览合并更新，源码输入独立响应。
-- **可复现的验证：** 单元测试覆盖存储、编辑事务、安全与组件状态；Playwright 覆盖工作台和真实 tarball 消费流程。
+**English is the default and currently the only supported interface language**, regardless of browser language. This includes dialogs, accessibility labels, notices, new document templates, and the component example. Existing documents and imported content are preserved in their original language.
 
-最近一次本地验收通过 **51 项单元测试、24 项端到端测试**，覆盖 Chromium、Firefox、WebKit 与移动视口。完整环境、性能测量及覆盖边界见[验收记录](project/VALIDATION.md)；最新远端结果以顶部 CI 徽章为准。
+UI copy lives in typed English catalogs under `src/i18n`, `packages/editor/src/i18n`, and `examples/react-consumer/src/i18n`. Parameterized messages handle counts and dynamic text; dates and numbers use English formatting. See the [localization guide](project/LOCALIZATION.md) before adding another locale. Internal development records may still be in Chinese.
+
+## Engineering foundations
+
+- **Clear boundaries:** the workspace owns document lifecycle, the editor owns editing transactions, and the preview owns rendering. Reusable components are packaged independently.
+- **Explicit contracts:** strict TypeScript, React peer dependencies, ESM output, type declarations, and scoped styles.
+- **On-demand extensions:** formulas, diagrams, and highlighting load separately. Large-document preview updates are coalesced while source editing responds independently.
+- **Reproducible checks:** unit tests exercise storage, editing, safety, and component state; Playwright tests cover the workspace and an application consuming the actual tarball.
+
+The browser suite covers Chromium, Firefox, WebKit, and a mobile viewport. See the [validation record](project/VALIDATION.md) for environments and coverage limits, and the CI badge above for the latest remote result.
 
 ```bash
-# 格式、类型、单元测试、应用构建与组件产物检查
+# Formatting, types, unit tests, application build, and package verification
 npm run check
 
-# 跨浏览器用户流程
+# Cross-browser user flows
 npm run example:setup
 npm run example:build
 npx playwright install chromium firefox webkit
 npm run test:e2e
 
-# 性能基准与产物 / 依赖许可报告
+# Performance measurements and artifact / dependency license reports
 npm run benchmark
 npm run release:report
 ```
 
-## 路线与贡献
+## Roadmap and contributions
 
-接下来持续打磨长文交互、依赖体积、真实输入法与移动设备体验，并推进组件包发布。当前不提供云同步、内置图片上传后端或离线 Service Worker；SSR 框架集成仍需单独验证。
+Ongoing work focuses on long-document responsiveness, bundle size, real input-method and mobile-device coverage, and package publication. Cloud sync, a built-in image upload service, and an offline service worker are not included. SSR framework integrations require separate validation.
 
-欢迎通过 [Issues](https://github.com/honkinglin/MarkEdit/issues) 提交可复现的问题与使用场景，或按[贡献指南](CONTRIBUTING.md)参与改进。
+Share reproducible bugs and use cases in [Issues](https://github.com/honkinglin/MarkEdit/issues), or follow the [contribution guide](CONTRIBUTING.md).
 
-[架构设计](project/ARCHITECTURE.md) · [开发路线图](project/ROADMAP.md) · [发布检查表](project/RELEASE.md) · [变更日志](CHANGELOG.md)
+[Project status](project/STATUS.md) · [Architecture](project/ARCHITECTURE.md) · [Roadmap](project/ROADMAP.md) · [Release checklist](project/RELEASE.md) · [Changelog](CHANGELOG.md)
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © honkinglin and contributors. See [third-party notices](THIRD_PARTY_NOTICES.md) for dependency and font licenses.

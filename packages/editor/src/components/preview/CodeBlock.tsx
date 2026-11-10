@@ -1,3 +1,4 @@
+import { messages } from '../../i18n';
 import { useEffect, useState } from 'react';
 export function CodeBlock({ source, language }: { source: string; language: string }) {
   const [result, setResult] = useState<{
@@ -30,16 +31,16 @@ export function CodeBlock({ source, language }: { source: string; language: stri
           type="button"
           onClick={() => {
             if (!navigator.clipboard) {
-              setCopied('复制失败，请手动选择');
+              setCopied(messages.copyFailedSelectAndCopyManually);
               return;
             }
             void navigator.clipboard
               .writeText(source)
-              .then(() => setCopied('已复制'))
-              .catch(() => setCopied('复制失败，请手动选择'));
+              .then(() => setCopied(messages.copied))
+              .catch(() => setCopied(messages.copyFailedSelectAndCopyManually));
           }}
         >
-          {copied || '复制代码'}
+          {copied || messages.copyCode}
         </button>
       </div>
       <pre>

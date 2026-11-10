@@ -1,3 +1,4 @@
+import { messages } from './i18n';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
@@ -105,7 +106,7 @@ export default function App() {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
         void flush()
-          .then(() => setNotice('已保存当前文档'))
+          .then(() => setNotice(messages.documentSaved))
           .catch(() => undefined);
       }
       if (event.key === 'Escape') setFocus(false);
@@ -118,12 +119,12 @@ export default function App() {
     if (await promise) setNotice(message);
   }
   function create() {
-    void run(workspace.create(), '已新建文档');
+    void run(workspace.create(), messages.documentCreated);
   }
   function download() {
     if (!active) return;
     downloadText(markdownFilename(active.name), active.content);
-    setNotice('已导出当前 Markdown');
+    setNotice(messages.markdownExported);
   }
   async function backup() {
     try {
@@ -133,7 +134,7 @@ export default function App() {
         exportBackup(records),
         'application/json;charset=utf-8',
       );
-      setNotice(`已备份 ${records.length} 份文档（含回收站与版本）`);
+      setNotice(messages.backupComplete(records.length));
     } catch {
       /* The workspace displays persistence errors. */
     }
@@ -141,21 +142,25 @@ export default function App() {
   async function importFile(file: File | undefined, isBackup = false) {
     if (!file) return;
     if (!(isBackup ? /\.json$/i : /\.(md|markdown|txt)$/i).test(file.name)) {
-      workspace.setError(isBackup ? '请选择 MarkEdit JSON 备份。' : '请选择 Markdown 或文本文件。');
+      workspace.setError(
+        isBackup ? messages.chooseAMarkEditJSONBackup : messages.chooseAMarkdownOrTextFile,
+      );
       return;
     }
     if (file.size > (isBackup ? 20 : 1) * 1024 * 1024) {
-      workspace.setError(isBackup ? '备份不能超过 20 MB。' : 'Markdown 文件不能超过 1 MB。');
+      workspace.setError(
+        isBackup ? messages.backupsMustBe20MBOrSmaller : messages.markdownFilesMustBe1MBOr,
+      );
       return;
     }
     try {
       const content = await file.text();
       await run(
         isBackup ? workspace.importBackup(content) : workspace.create({ name: file.name, content }),
-        isBackup ? '已将备份导入为独立副本，现有文档未被覆盖' : '已导入为新文档',
+        isBackup ? messages.backupImported : messages.importedAsANewDocument,
       );
     } catch {
-      workspace.setError('文件读取失败，请重新选择。');
+      workspace.setError(messages.fileReadFailed);
     }
   }
   function jump(heading: Heading) {
@@ -165,40 +170,51 @@ export default function App() {
   }
   const commands: Command[] = [
     {
-      label: syncScroll ? '关闭同步滚动' : '开启同步滚动',
+      label: syncScroll ? messages.disableScrollSync : messages.enableScrollSync,
       run: () => setSyncScroll((value) => !value),
     },
-    { label: '新建文档', run: create, disabled: !ready || busy },
+    { label: messages.newDocument, run: create, disabled: !ready || busy },
     {
-      label: '保存当前文档',
+      label: messages.saveCurrentDocument,
       shortcut: '⌘/Ctrl S',
       run: () =>
         void flush()
-          .then(() => setNotice('已保存当前文档'))
+          .then(() => setNotice(messages.documentSaved))
           .catch(() => undefined),
       disabled: !active || busy,
     },
     {
-      label: '导入 Markdown 为新文档',
+      label: messages.importMarkdownAsANewDocument,
       run: () => fileInput.current?.click(),
       disabled: !ready || busy,
     },
-    { label: '导出当前 Markdown', run: download, disabled: !active },
-    { label: '备份全部文档与历史', run: () => void backup(), disabled: !ready || busy },
-    { label: '导入工作台备份', run: () => backupInput.current?.click(), disabled: !ready || busy },
+    { label: messages.exportCurrentMarkdown, run: download, disabled: !active },
     {
-      label: '保存版本快照',
-      run: () => void run(workspace.checkpoint(), '已保存版本快照'),
+      label: messages.backUpAllDocumentsAndHistory,
+      run: () => void backup(),
+      disabled: !ready || busy,
+    },
+    {
+      label: messages.importWorkspaceBackup,
+      run: () => backupInput.current?.click(),
+      disabled: !ready || busy,
+    },
+    {
+      label: messages.saveVersionSnapshot,
+      run: () => void run(workspace.checkpoint(), messages.versionSnapshotSaved),
       disabled: !active || busy,
     },
-    { label: '查看版本历史', run: () => setPanel('history'), disabled: !active },
-    { label: '查看文档目录', run: () => setPanel('outline') },
+    { label: messages.viewVersionHistory, run: () => setPanel('history'), disabled: !active },
+    { label: messages.viewDocumentOutline, run: () => setPanel('outline') },
     {
-      label: focus ? '退出专注模式' : '进入专注模式',
-      shortcut: 'Esc 退出',
+      label: focus ? messages.exitFocusMode : messages.enterFocusMode,
+      shortcut: messages.escToExit,
       run: () => setFocus((value) => !value),
     },
-    { label: dark ? '切换浅色主题' : '切换深色主题', run: () => setDark((value) => !value) },
+    {
+      label: dark ? messages.switchToLightTheme : messages.switchToDarkTheme,
+      run: () => setDark((value) => !value),
+    },
   ];
   return (
     <div className={`app ${dark ? 'dark' : ''} ${focus ? 'focus-mode' : ''}`}>
@@ -207,9 +223,9 @@ export default function App() {
           documents={documents}
           active={active}
           busy={busy || !ready}
-          onSelect={(id) => void run(workspace.switchDocument(id), '已切换文档')}
+          onSelect={(id) => void run(workspace.switchDocument(id), messages.documentSwitched)}
           onCreate={create}
-          onRestore={(doc) => void run(workspace.restore(doc), '已恢复文档')}
+          onRestore={(doc) => void run(workspace.restore(doc), messages.documentRestored)}
           onClose={() => setSidebar(false)}
         />
       )}
@@ -218,27 +234,27 @@ export default function App() {
           <div className="breadcrumbs">
             <button
               className="icon-button"
-              aria-label={sidebar ? '收起侧栏' : '展开侧栏'}
+              aria-label={sidebar ? messages.collapseSidebar : messages.expandSidebar}
               onClick={() => setSidebar((value) => !value)}
             >
               <PanelLeftClose size={18} />
             </button>
-            <span>我的文档</span>
+            <span>{messages.myDocuments}</span>
             <span className="slash">/</span>
-            <strong>{active?.name || '写作空间'}</strong>
+            <strong>{active?.name || messages.writingSpace}</strong>
           </div>
           <div className="header-actions">
             <button
               className="icon-button"
-              title="命令菜单 · ⌘/Ctrl K"
-              aria-label="打开命令菜单"
+              title={messages.commandMenuCtrlK}
+              aria-label={messages.openCommandMenu}
               onClick={() => setMenu(true)}
             >
               <CommandIcon size={18} />
             </button>
             <button
               className="icon-button"
-              aria-label={dark ? '切换浅色主题' : '切换深色主题'}
+              aria-label={dark ? messages.switchToLightTheme : messages.switchToDarkTheme}
               onClick={() => setDark(!dark)}
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
@@ -249,11 +265,11 @@ export default function App() {
               onClick={() => fileInput.current?.click()}
             >
               <ArrowUpFromLine size={16} />
-              导入
+              {messages.import}
             </button>
             <button className="export-button" disabled={!active} onClick={download}>
               <ArrowDownToLine size={16} />
-              导出 Markdown
+              {messages.exportMarkdown}
             </button>
           </div>
         </header>
@@ -286,29 +302,25 @@ export default function App() {
                   <button
                     disabled={busy}
                     onClick={() => {
-                      if (
-                        window.confirm(
-                          '载入最新版本会丢弃本页未保存修改。你也可以取消后选择另存副本。继续？',
-                        )
-                      )
-                        void run(workspace.reloadRemote(), '已载入最新版本');
+                      if (window.confirm(messages.confirmReload))
+                        void run(workspace.reloadRemote(), messages.latestVersionLoaded);
                     }}
                   >
-                    载入最新版本
+                    {messages.loadLatestVersion}
                   </button>
                   <button
                     disabled={busy}
-                    onClick={() => void run(workspace.saveCopy(), '已另存冲突副本')}
+                    onClick={() => void run(workspace.saveCopy(), messages.conflictCopySaved)}
                   >
-                    另存副本
+                    {messages.saveACopy}
                   </button>
                 </>
               ) : (
                 <button disabled={busy} onClick={workspace.retry}>
-                  重试保存 / 加载
+                  {messages.retrySaveLoad}
                 </button>
               )}
-              {active && <button onClick={download}>导出当前内容</button>}
+              {active && <button onClick={download}>{messages.exportCurrentContent}</button>}
             </div>
           </div>
         )}
@@ -319,7 +331,7 @@ export default function App() {
                 <div className="eyebrow">YOUR SPACE TO THINK</div>
                 <label className="title-label">
                   <input
-                    aria-label="文档名称"
+                    aria-label={messages.documentName}
                     value={active.name}
                     disabled={busy}
                     onChange={(event) => workspace.edit({ name: event.target.value })}
@@ -329,28 +341,28 @@ export default function App() {
                 <div className="save-label" role="status">
                   <span className={status === 'saved' ? 'status-dot' : 'status-dot pending'} />
                   {status === 'saved'
-                    ? '所有更改已保存到本地'
+                    ? messages.allChangesSavedLocally
                     : status === 'saving'
-                      ? '正在保存…'
+                      ? messages.saving
                       : status === 'error'
-                        ? '保存已暂停'
-                        : '等待保存…'}
-                  <span className="meta-separator">·</span>Markdown 文档
+                        ? messages.savingPaused
+                        : messages.waitingToSave}
+                  <span className="meta-separator">·</span> {messages.markdownDocument}
                 </div>
               </div>
               <div className="document-controls">
                 <button
                   className="icon-button"
-                  aria-label="移入回收站"
-                  title="移入回收站，可恢复"
+                  aria-label={messages.moveToTrash}
+                  title={messages.moveToTrashYouCanRestoreIt}
                   disabled={busy}
-                  onClick={() => void run(workspace.remove(), '已移入回收站，可在侧栏恢复')}
+                  onClick={() => void run(workspace.remove(), messages.documentTrashed)}
                 >
                   <Trash2 size={16} />
                 </button>
                 <button
                   className="icon-button"
-                  aria-label={focus ? '退出专注模式' : '进入专注模式'}
+                  aria-label={focus ? messages.exitFocusMode : messages.enterFocusMode}
                   aria-pressed={focus}
                   onClick={() => setFocus(!focus)}
                 >
@@ -358,7 +370,7 @@ export default function App() {
                 </button>
                 <button
                   className="icon-button"
-                  aria-label="文档目录"
+                  aria-label={messages.documentOutline}
                   aria-pressed={panel === 'outline'}
                   onClick={() => setPanel(panel === 'outline' ? null : 'outline')}
                 >
@@ -366,18 +378,18 @@ export default function App() {
                 </button>
                 <button
                   className="icon-button"
-                  aria-label="版本历史"
+                  aria-label={messages.versionHistory}
                   aria-pressed={panel === 'history'}
                   onClick={() => setPanel(panel === 'history' ? null : 'history')}
                 >
                   <History size={17} />
                 </button>
-                <div className="view-switch" role="group" aria-label="编辑视图">
+                <div className="view-switch" role="group" aria-label={messages.editorView}>
                   {(
                     [
-                      { id: 'edit', label: '编辑', icon: PenLine },
-                      { id: 'split', label: '分屏', icon: Columns2 },
-                      { id: 'preview', label: '预览', icon: BookOpen },
+                      { id: 'edit', label: messages.edit, icon: PenLine },
+                      { id: 'split', label: messages.split, icon: Columns2 },
+                      { id: 'preview', label: messages.preview, icon: BookOpen },
                     ] as const
                   ).map((item) => (
                     <button
@@ -401,13 +413,13 @@ export default function App() {
                   <div className="pane-label">
                     <span>
                       <PenLine size={13} />
-                      编辑器
+                      {messages.editor}
                     </span>
                     {mode === 'split' && (
                       <label className="split-control">
-                        分屏{' '}
+                        {messages.split}{' '}
                         <input
-                          aria-label="编辑器宽度"
+                          aria-label={messages.editorWidth}
                           type="range"
                           min="30"
                           max="70"
@@ -428,19 +440,23 @@ export default function App() {
                     disabled={busy}
                   />
                 </div>
-                <section className="preview-column" hidden={mode === 'edit'} aria-label="预览区域">
+                <section
+                  className="preview-column"
+                  hidden={mode === 'edit'}
+                  aria-label={messages.previewArea}
+                >
                   <div className="pane-label">
                     <span>
                       <BookOpen size={13} />
-                      实时预览
+                      {messages.livePreview}
                     </span>
                     <button
                       className="sync-toggle"
                       aria-pressed={syncScroll}
                       onClick={() => setSyncScroll((value) => !value)}
-                      title="基于源码行位置同步滚动"
+                      title={messages.syncScrollingBySourceLinePosition}
                     >
-                      同步滚动 {syncScroll ? '开' : '关'}
+                      {messages.scrollSync} {syncScroll ? messages.on : messages.off}
                     </button>
                     <span className="live-label">
                       <span /> LIVE
@@ -455,7 +471,7 @@ export default function App() {
                 <aside className="detail-panel">
                   <button
                     className="panel-close icon-button"
-                    aria-label="关闭详情面板"
+                    aria-label={messages.closeDetailsPanel}
                     onClick={() => setPanel(null)}
                   >
                     <X size={14} />
@@ -463,42 +479,44 @@ export default function App() {
                   {panel === 'outline' ? (
                     <Outline headings={headings} onJump={jump} />
                   ) : (
-                    <section className="history-panel" aria-label="版本历史">
+                    <section className="history-panel" aria-label={messages.versionHistory}>
                       <div className="pane-label">
-                        <span>版本历史</span>
+                        <span>{messages.versionHistory}</span>
                       </div>
                       <button
                         className="snapshot-button"
                         disabled={busy}
-                        onClick={() => void run(workspace.checkpoint(), '已保存版本快照')}
+                        onClick={() =>
+                          void run(workspace.checkpoint(), messages.versionSnapshotSaved)
+                        }
                       >
                         <Save size={15} />
-                        保存快照
+                        {messages.saveSnapshot}
                       </button>
-                      <p className="empty-hint">
-                        自动版本间隔至少 30 秒，保留最近 30 份。恢复前会保存当前版本。
-                      </p>
+                      <p className="empty-hint">{messages.snapshotPolicy}</p>
                       <div className="version-list">
                         {[...active.snapshots].reverse().map((snapshot) => (
                           <div className="version-entry" key={snapshot.id}>
-                            <strong>{snapshot.name || '未命名.md'}</strong>
-                            <time>{new Date(snapshot.createdAt).toLocaleString('zh-CN')}</time>
-                            <span>{snapshot.content.length} 字符</span>
+                            <strong>{snapshot.name || messages.untitledMd}</strong>
+                            <time>{new Date(snapshot.createdAt).toLocaleString('en')}</time>
+                            <span>{messages.characterCount(snapshot.content.length)}</span>
                             <button
                               disabled={busy}
                               onClick={() =>
                                 void run(
                                   workspace.restoreVersion(snapshot.id),
-                                  '已恢复所选版本，恢复前的内容也已保留',
+                                  messages.versionRestored,
                                 )
                               }
                             >
                               <RotateCcw size={13} />
-                              恢复此版本
+                              {messages.restoreThisVersion}
                             </button>
                           </div>
                         ))}
-                        {!active.snapshots.length && <p className="empty-hint">还没有历史版本。</p>}
+                        {!active.snapshots.length && (
+                          <p className="empty-hint">{messages.noVersionsYet}</p>
+                        )}
                       </div>
                     </section>
                   )}
@@ -507,11 +525,11 @@ export default function App() {
             </div>
             <footer className="statusbar">
               <span>
-                {Array.from(active.content.replace(/\s/g, '')).length.toLocaleString()} 字符
+                {messages.characterCount(Array.from(active.content.replace(/\s/g, '')).length)}{' '}
                 <span className="meta-separator">·</span>
-                {active.content.split('\n').length} 行
+                {messages.lineCount(active.content.split('\n').length)}
               </span>
-              <span className="keyboard-hint">⌘ / Ctrl + K 命令菜单</span>
+              <span className="keyboard-hint">{messages.ctrlKCommands}</span>
               <span>
                 <Check size={13} /> UTF-8
               </span>
@@ -520,15 +538,19 @@ export default function App() {
         ) : (
           <div className="empty-workspace">
             <BookOpen size={36} />
-            <h1>{status === 'loading' ? '正在打开文档库…' : '给下一个想法，一张白纸。'}</h1>
+            <h1>
+              {status === 'loading'
+                ? messages.openingYourLibrary
+                : messages.aBlankPageForYourNextIdea}
+            </h1>
             <p>
               {status === 'loading'
-                ? '正在读取本地文档，首次使用会迁移旧草稿。'
-                : '新建文档，或者从回收站找回之前的记录。'}
+                ? messages.loadingLocalDocumentsAndMigratingAnyPrevious
+                : messages.createADocumentOrRestoreOneFrom}
             </p>
             <button className="export-button" disabled={!ready || busy} onClick={create}>
               <Plus size={16} />
-              新建文档
+              {messages.newDocument}
             </button>
           </div>
         )}

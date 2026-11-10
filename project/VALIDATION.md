@@ -1,4 +1,15 @@
-# P5 验收记录
+# 验收记录
+
+## English interface update · 2026-11-10
+
+- 53 unit tests passed, including English count formatting and preservation of existing multilingual drafts.
+- 28 Playwright tests passed across Chromium, Firefox, WebKit, and mobile Chromium. English UI and templates remain the default with a Chinese browser locale. Existing Chinese content still saves, reloads, backs up, and downloads without translation.
+- The workspace, reusable component, and independent tarball example build successfully. Package verification follows shared JS chunks when checking external React imports.
+- README screenshots were refreshed from the English production builds.
+- These changes are local; the latest inspected remote CI ([run 42755427315](https://github.com/honkinglin/MarkEdit/actions/runs/42755427315)) passed for `ca913f7`, before this English update.
+- Remaining work is tracked in [STATUS.md](STATUS.md).
+
+## P5 baseline (historical)
 
 日期：2026-11-09。环境：macOS arm64、Node 24.14；本地生产构建与独立 tarball 消费示例。结果针对当前工作区，不能替代推送后的 GitHub CI 和线上域名验收。
 

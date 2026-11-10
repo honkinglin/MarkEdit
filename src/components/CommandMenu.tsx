@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 export interface Command {
@@ -25,7 +26,9 @@ export function CommandMenu({
       search.current?.focus();
     } else dialog.current?.close();
   }, [open]);
-  const matching = commands.filter((command) => command.label.includes(query.trim()));
+  const matching = commands.filter((command) =>
+    command.label.toLocaleLowerCase('en').includes(query.trim().toLocaleLowerCase('en')),
+  );
   return (
     <dialog
       ref={dialog}
@@ -37,8 +40,8 @@ export function CommandMenu({
       }}
     >
       <div className="dialog-heading">
-        <h2 id="command-title">命令与快捷键</h2>
-        <button aria-label="关闭命令菜单" onClick={onClose}>
+        <h2 id="command-title">{messages.commandsAndShortcuts}</h2>
+        <button aria-label={messages.closeCommandMenu} onClick={onClose}>
           <X size={18} />
         </button>
       </div>
@@ -47,8 +50,8 @@ export function CommandMenu({
         <input
           ref={search}
           autoFocus
-          aria-label="搜索命令"
-          placeholder="想做些什么？"
+          aria-label={messages.searchCommands}
+          placeholder={messages.whatWouldYouLikeToDo}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
@@ -77,12 +80,11 @@ export function CommandMenu({
             {command.shortcut && <kbd>{command.shortcut}</kbd>}
           </button>
         ))}
-        {matching.length === 0 && <p className="empty-hint">没有匹配的命令</p>}
+        {matching.length === 0 && <p className="empty-hint">{messages.noMatchingCommands}</p>}
       </div>
       <p className="shortcut-help">
-        编辑器内：⌘/Ctrl + F 搜索 · ⌘/Ctrl + Z 撤销
-        <br />
-        ⌘/Ctrl + K 命令菜单 · ⌘/Ctrl + S 保存 · Esc 关闭菜单或退出专注
+        {messages.editorShortcuts} <br />
+        {messages.workspaceShortcuts}
       </p>
     </dialog>
   );

@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import { memo, useId, useMemo } from 'react';
 import type { MarkdownPreviewProps } from '../types';
 import { remarkHeadings } from '../lib/headings';
@@ -33,7 +34,7 @@ const components: Components = {
           <MermaidBlock source={source} />
         ) : language === 'flow' || language === 'seq' ? (
           <>
-            <p className="render-error">旧版 {language} 语法暂不兼容，请改为 mermaid 代码块。</p>
+            <p className="render-error">{messages.unsupportedDiagram(language)}</p>
             <CodeBlock source={source} language="text" />
           </>
         ) : (
@@ -74,7 +75,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   );
   return (
     <div className={`markedit markedit-preview ${className}`} data-theme={theme} style={style}>
-      <article className="markdown-body" aria-label="Markdown 预览">
+      <article className="markdown-body" aria-label={messages.markdownPreview}>
         <Markdown remarkPlugins={plugins} components={components} skipHtml>
           {value}
         </Markdown>

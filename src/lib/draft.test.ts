@@ -23,6 +23,6 @@ describe('导出文件名', () => {
   it('保留 Markdown 扩展名并移除路径分隔符', () => {
     expect(markdownFilename('笔记.md')).toBe('笔记.md');
     expect(markdownFilename('../笔记')).toBe('..-笔记.md');
-    expect(markdownFilename('')).toBe('未命名.md');
+    expect(markdownFilename('')).toBe('Untitled.md');
   });
 });

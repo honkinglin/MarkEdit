@@ -1,3 +1,4 @@
+import { messages } from '../i18n';
 import {
   useCallback,
   useImperativeHandle,
@@ -27,7 +28,7 @@ export function MarkdownEditor({
   height = 480,
   className = '',
   style,
-  ariaLabel = 'Markdown 源码',
+  ariaLabel = messages.markdownSource,
   ref,
 }: MarkdownEditorProps) {
   const controlled = useRef(value !== undefined).current;

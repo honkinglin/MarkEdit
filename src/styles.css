@@ -705,7 +705,8 @@ button:disabled {
   gap: 4px;
 }
 .library-tabs button {
-  flex: 1;
+  flex: 1 1 auto;
+  white-space: nowrap;
   padding: 10px 4px;
   font-size: 11px;
 }

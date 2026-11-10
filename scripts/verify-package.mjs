@@ -17,7 +17,20 @@ for (const name of ['style.css', 'lib/math.css']) {
     if (!match[1].startsWith('data:')) await access(path.resolve(path.dirname(file), match[1]));
   }
 }
-const entry = await readFile(path.join(base, 'index.js'), 'utf8');
+// Rollup may move the public entry's implementation into shared chunks.
+// Verify imports across its reachable JS graph rather than assuming one file.
+const visited = new Set();
+async function readModuleGraph(file) {
+  if (visited.has(file)) return '';
+  visited.add(file);
+  const source = await readFile(file, 'utf8');
+  const dependencies = [...source.matchAll(/(?:from\s*|import\s*\()\s*["'](\.[^"']+\.js)["']/g)];
+  const children = await Promise.all(
+    dependencies.map((match) => readModuleGraph(path.resolve(path.dirname(file), match[1]))),
+  );
+  return [source, ...children].join('\n');
+}
+const entry = await readModuleGraph(path.resolve(base, 'index.js'));
 assert.match(entry, /from "react"/);
 assert.match(entry, /from "react\/jsx-runtime"/);
 await access(path.join(base, 'index.d.ts'));
