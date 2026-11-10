@@ -65,9 +65,7 @@ if (!pkg.license || pkg.license === 'UNLICENSED') blockers.push('本项目开源
 if (!remotes) blockers.push('尚未配置 Git remote，GitHub CI 无远端执行记录。');
 if (!consumerMatches)
   blockers.push('独立示例 lockfile 与当前 tarball 不匹配，请运行 npm run example:setup。');
-blockers.push(
-  'npm 发布账号、包名可用性与正式 release 仍需确认；Vercel 演示已上线，当前报告不检查线上状态。',
-);
+
 const report = {
   generatedAt: new Date().toISOString(),
   package: {
@@ -87,7 +85,7 @@ const report = {
   missingLicenseMetadata: notices
     .filter((item) => !item.license)
     .map((item) => `${item.name}@${item.version}`),
-  readyForPublicRelease: false,
+  artifactMetadataReady: blockers.length === 0,
   blockers,
   note: '脚本检查产物与元数据，不代表测试已运行、第三方许可审核完成或线上部署已成功。',
 };

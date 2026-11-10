@@ -129,6 +129,14 @@ CI、E2E 流程、贡献指南、架构和发布报告已实现。GitHub 仓库�
 - [ ] 后续优化：主线程长任务、复杂文档与密集输入、Mermaid 大型延迟加载块。
 - 证据与限制：[PERFORMANCE.md](PERFORMANCE.md)。本阶段不宣称已消除长任务，不改变现有 180ms 长文预览合并策略。
 
+### P8 · 包发布流程（2026-11-10）
+
+- [x] 确认包名 `mark-edit`、首发版本 `0.1.0`、npm 账号 `kyrielin`。
+- [x] 安装文档、动态版本产物、独立包消费、发布文件与许可证检查。
+- [x] 精确 tarball 校验与 tag 驱动发布工作流；首次发布使用本地登录。
+- [ ] npm trusted publisher 账号侧配置；仓库工作流文件不能代替此设置。
+- 公开版本状态见 npm 与 GitHub Releases；操作说明见 [RELEASE.md](RELEASE.md)。
+
 ## 7. 风险与处理
 
 - 数据：localStorage 仅用于单草稿；捕获配额/权限异常；损坏数据不静默覆盖；多标签冲突在 P2 处理。

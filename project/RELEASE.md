@@ -1,35 +1,55 @@
-# 发布检查表
+# Release guide
 
-工作台已部署到 [Vercel 演示站](https://markedit-seven.vercel.app)。`private: true` 有意保留，CI 不包含发布凭证、npm publish 或部署步骤。
+The React package is `mark-edit`; the first version is `0.1.0`. The private root workspace is never published. The package is MIT-licensed and associated with `honkinglin/MarkEdit`. The verified npm account for the first release is `kyrielin`.
 
-## 可复现的候选版本
+## Prepare an exact candidate
 
-1. `npm ci`；`npm run check`。
-2. `npm run example:setup`；`npm run example:build`。
-3. `npx playwright install chromium firefox webkit`；`npm run test:e2e`。
-4. `npm run benchmark`；`npm run release:report`。
-5. 检查 `.benchmarks/release-report.json` 与 `third-party-notices.json`；核对当前 tarball 和消费项目 lockfile 的一致性。
+```bash
+npm ci
+npx playwright install --with-deps chromium firefox webkit
+npm run release:prepare
+npm run release:report
+```
 
-报告中的阻塞项会明确列出；即使本地检查成功，也不会自动宣称已公开发布。GitHub CI 配置本身不等于远端执行成功。
+`release:prepare` checks formatting, types, tests, production builds, the JS budget, the independent tarball consumer, and browser flows. `release:verify` inspects the tarball file list, metadata, licenses, entry points, and the consumer lockfile integrity, then writes `.benchmarks/release-manifest.json` and `SHA256SUMS`.
 
-## 公开发布前需要确定
+Commit the release source and rerun `npm run release:verify` so the manifest identifies a clean commit. Publishing uses the already-tested tarball with lifecycle scripts disabled. Do not rebuild a different artifact between verification and publishing.
 
-- GitHub 仓库：`honkinglin/MarkEdit`；npm 包名可用性、发布账号和版本号仍待确认。
-- 本项目已采用 MIT，署名 honkinglin and contributors；组件包同时包含 LICENSE。
-- 审阅第三方依赖许可及字体许可；自动清单不代替许可审核。KaTeX 许可已随组件字体产物保留。
-- Vercel 团队：`Kyrie Lin's projects`（Hobby），项目 `markedit` 已关联 `honkinglin/MarkEdit` 的 `main` 分支并上线。
-- 更新包 README、CHANGELOG、repository、license、版本与消费项目依赖；再解除组件包 `private`。
+```bash
+node scripts/publish-artifact.mjs --dry-run
+node scripts/publish-artifact.mjs
+```
 
-## 静态演示部署参数
+For the first publish, log in with `npm login` and complete any npm browser/2FA prompts yourself. Never put passwords, tokens, or authentication state in this repository. A registry 404 during a name lookup does not guarantee npm will accept the name.
 
-工作台：仓库根目录，安装 `npm ci`，构建 `npm run build`，输出 `dist`。该应用使用浏览器存储，不需要数据库或密钥；更换域名会进入不同的本地文档空间，用户必须自行导出/导入迁移。
+## Future versions
 
-组件示例：根目录运行 `npm ci && npm run example:setup && npm run example:build`，输出 `examples/react-consumer/dist`。示例正文只在内存中。
+```bash
+npm version patch --workspace packages/editor --no-git-tag-version
+```
 
-正式部署前确认静态资源路径、CSP 与图片来源策略；不要把测试报告里的草稿或下载物作为公开站点文件。发布后在真实域名再次验证资源加载、保存/刷新、下载与窄屏交互。
+Create `releases/<version>.md`, update CHANGELOG, and run `release:prepare`. The tarball and example dependency paths are derived from the package version, so scripts do not need a hardcoded filename change. Commit all source and lockfile updates, then tag that reviewed main-branch commit as `v<version>`.
 
-## 尚需人工覆盖
+## GitHub Actions publishing
 
-Playwright 的 WebKit 不等同于真实 Safari 全矩阵；移动视口不等同于真机。真实中文输入法组合输入、系统剪贴板权限、浏览器配额耗尽、浏览器崩溃和上传后端还需人工验收。测试中的中文填入不能证明输入法兼容性。
+`.github/workflows/release.yml` handles version tags:
 
-根目录 `vercel.json` 已声明 Vite、npm ci、npm run build 和 dist。已启用 Vercel Git 集成，推送 main 会触发生产部署；GitHub 验证 CI 本身不包含部署步骤。
+1. Confirm tag/version agreement and that the commit is on `main`.
+2. Run the complete candidate verification on a read-only job.
+3. Upload that tarball, its manifest, and checksum.
+4. Download the artifact in the `npm` environment, verify the checksum and commit, and publish via npm trusted publishing.
+5. Create a GitHub Release with versioned notes and the matching artifact/checksum.
+
+After the initial package exists, configure its npm **Trusted Publisher** with GitHub owner `honkinglin`, repository `MarkEdit`, workflow `release.yml`, environment `npm`, and permission to publish directly. Configure the GitHub `npm` environment as appropriate for your release process. This account-side setup is separate from committing the workflow and has not been inferred from a successful local login.
+
+The workflow uses Node 24 and npm's OIDC flow without a long-lived npm token. See [npm trusted publishing documentation](https://docs.npmjs.com/trusted-publishers/) for runtime requirements and configuration. Re-running a release may reuse an already-published version only when its registry integrity exactly matches the candidate; a different artifact with the same version is rejected.
+
+## Dependency review and validation limits
+
+The direct formula renderer is KaTeX `^0.19.1`. The upstream math-parser dependency still declares an older transitive KaTeX. See the package README for the documented application-level override and advisory. Review the generated production license inventory; it is not a substitute for a license review.
+
+Playwright WebKit is not the full Safari/device matrix. Real IME composition, OS clipboard permissions, storage quota exhaustion, crash recovery, and upload backends still need separate validation.
+
+## Demo deployment
+
+The workspace is deployed at <https://markedit-seven.vercel.app>. Vercel builds `main` from the repository root using `npm ci`, `npm run build`, and `dist`. The demo needs no server secrets or database. Document storage is origin-specific; changing domains requires exporting and importing documents to migrate them.

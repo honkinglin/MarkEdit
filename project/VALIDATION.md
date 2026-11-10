@@ -1,5 +1,14 @@
 # 验收记录
 
+## Release candidate · mark-edit 0.1.0 · 2026-11-10
+
+- npm identity checked as `kyrielin`; package metadata and imports renamed to `mark-edit`.
+- 55 component/workspace unit tests and 5 release-integrity tests passed; 32 browser flows passed.
+- Production builds, initial-JS budget, package file/license checks, and consumer/tarball integrity checks passed.
+- The independent consumer applies its own KaTeX override from its working directory; its production dependency audit reports zero advisories with that override. Consumers without the documented override may still see the upstream low-severity transitive KaTeX advisory.
+- Release workflow uses the exact verified artifact, validates tag/commit/checksum, and supports npm trusted publishing after account-side configuration. Local npm login alone does not configure OIDC.
+- Actual published versions are recorded by npm and GitHub Releases; this candidate record is not proof that publication succeeded.
+
 ## Performance update · 2026-11-10
 
 The P7 implementation and measurements are documented in [PERFORMANCE.md](PERFORMANCE.md). Unit coverage includes committed outline metadata and document replacement. Browser coverage adds desktop list continuation/undo, URL-paste handling, and outline navigation across layouts. Clipboard data is simulated explicitly because Firefox clears data in constructed ClipboardEvents; OS clipboard permissions and actual mobile IME input are not covered by this test.

@@ -1,7 +1,6 @@
 {
-  "name": "@markedit/react",
+  "name": "mark-edit",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "files": [
     "dist",
@@ -44,7 +43,8 @@
     "unist-util-visit": "^5.2.0"
   },
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json && node scripts/math-css.mjs"
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/math-css.mjs",
+    "prepack": "npm run build"
   },
   "license": "MIT",
   "repository": {
@@ -52,5 +52,22 @@
     "url": "git+https://github.com/honkinglin/MarkEdit.git",
     "directory": "packages/editor"
   },
-  "description": "React Markdown editor and preview with CodeMirror 6, math and diagrams"
+  "description": "React Markdown editor and preview with CodeMirror 6, math and diagrams",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "homepage": "https://github.com/honkinglin/MarkEdit#react-components",
+  "bugs": {
+    "url": "https://github.com/honkinglin/MarkEdit/issues"
+  },
+  "keywords": [
+    "markdown",
+    "react",
+    "editor",
+    "codemirror",
+    "typescript",
+    "mermaid",
+    "katex"
+  ]
 }

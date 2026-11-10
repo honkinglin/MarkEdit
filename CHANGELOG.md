@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0 — mark-edit initial package release
+
+- Publishable package name `mark-edit`, English installation/API documentation, and public package metadata.
+- Version-derived build artifacts, release manifests, license/file checks, and tested-artifact integrity enforcement.
+- Tag-driven npm trusted publishing and GitHub Release workflow; first publish uses the maintainer’s local npm login.
+- Documented the upstream math-parser KaTeX advisory and application-level override.
+
 ## Unreleased — Performance foundations
 
 - Reuse committed preview headings through `MarkdownPreview.onHeadings`, avoiding duplicate workspace parsing.

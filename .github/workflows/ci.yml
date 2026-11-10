@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:e2e
       - run: npm run benchmark
       - run: npm run release:report
+      - run: npm run release:verify
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -42,6 +43,8 @@ jobs:
             .benchmarks/report.json
             .benchmarks/release-report.json
             .benchmarks/third-party-notices.json
-            .benchmarks/markedit-react-*.tgz
+            .benchmarks/mark-edit-*.tgz
+            .benchmarks/release-manifest.json
+            .benchmarks/SHA256SUMS
           if-no-files-found: warn
           retention-days: 14

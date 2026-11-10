@@ -71,8 +71,8 @@ Embed the editor in your product or render Markdown with the standalone preview.
 
 ```tsx
 import { useState } from 'react';
-import { MarkdownEditor } from '@markedit/react';
-import '@markedit/react/style.css';
+import { MarkdownEditor } from 'mark-edit';
+import 'mark-edit/style.css';
 
 export function WritingArea() {
   const [value, setValue] = useState('# Hello, MarkEdit');
@@ -85,14 +85,20 @@ export function WritingArea() {
 
 ![React components: controlled editor, independent instance, and standalone preview](assets/react-components.png)
 
-The component package is not yet published to npm. Build it locally or run the independent example, which installs the actual package tarball:
+Install the React package:
+
+```bash
+npm install mark-edit react@^19 react-dom@^19
+```
+
+For local development, run the independent example, which installs the actual package tarball:
 
 ```bash
 npm run example:setup
 npm run example:dev
 ```
 
-To use it in another React 19 application, install the generated `.benchmarks/markedit-react-0.1.0.tgz`.
+To use it in another React 19 application, install the generated `.benchmarks/mark-edit-0.1.0.tgz`.
 
 Read the [API and integration guide](packages/editor/README.md) for state contracts, extension points, styles, and browser requirements. The host application supplies image uploads through `uploadImage`.
 

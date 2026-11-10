@@ -1,10 +1,18 @@
-# @markedit/react
+# mark-edit
 
 A React 19 and TypeScript Markdown editor with a standalone preview. Built on CodeMirror 6, with GFM, KaTeX, Mermaid, and on-demand syntax highlighting. Independent of the workspace, IndexedDB, and localStorage.
 
-The package is currently private and has not been published to npm. It uses the MIT license and ships ESM, TypeScript declarations, and CSS. A bundler with CSS and dynamic import support is required. Interactive components target browsers; SSR framework integrations have not been validated.
+The package uses the MIT license and ships ESM, TypeScript declarations, and CSS. A bundler with CSS and dynamic import support is required. Interactive components target browsers; SSR framework integrations have not been validated.
 
-## Install a local build
+## Install
+
+```bash
+npm install mark-edit react@^19 react-dom@^19
+```
+
+Import `mark-edit/style.css` once in your application. For release status and version history, see [npm](https://www.npmjs.com/package/mark-edit) and [GitHub Releases](https://github.com/honkinglin/MarkEdit/releases).
+
+## Build from source
 
 From the repository root:
 
@@ -13,12 +21,12 @@ npm ci
 npm run pack:lib
 ```
 
-Install `.benchmarks/markedit-react-0.1.0.tgz` in another React 19 application, then import the styles explicitly:
+Install `.benchmarks/mark-edit-0.1.0.tgz` in another React 19 application, then import the styles explicitly:
 
 ```tsx
 import { useState } from 'react';
-import { MarkdownEditor } from '@markedit/react';
-import '@markedit/react/style.css';
+import { MarkdownEditor } from 'mark-edit';
+import 'mark-edit/style.css';
 
 export function WritingArea() {
   const [value, setValue] = useState('# Hello');
@@ -61,7 +69,7 @@ For content over 30,000 characters, preview updates are coalesced over 180 ms. S
 
 ```tsx
 import { useRef } from 'react';
-import { MarkdownEditor, type MarkdownEditorHandle } from '@markedit/react';
+import { MarkdownEditor, type MarkdownEditorHandle } from 'mark-edit';
 
 function Example() {
   const editor = useRef<MarkdownEditorHandle>(null);
@@ -90,7 +98,7 @@ CodeMirror extensions are trusted application code. Do not accept scripts from d
 ## MarkdownPreview
 
 ```tsx
-import { MarkdownPreview, getHeadings } from '@markedit/react';
+import { MarkdownPreview, getHeadings } from 'mark-edit';
 const prefix = 'article-a-';
 const headings = getHeadings('# Heading', prefix);
 // headings[0].id matches the rendered heading ID.
@@ -122,3 +130,19 @@ English is the default and currently the only supported interface language, incl
 Raw HTML is ignored. Math uses `trust: false` and expansion limits. Diagrams use strict mode, disable inline configuration, and sanitize SVG. Rendering failures affect individual blocks. External images are requested by the browser; hosts should define their own network privacy policy.
 
 Nonstandard `flow`, `seq`, and `[TOC]` directives are not supported. Use Mermaid diagrams and `getHeadings` for an outline.
+
+### Transitive math dependency
+
+The editor renders formulas with KaTeX `^0.19.1`. Upstream `remark-math` also installs an older KaTeX through `micromark-extension-math` for an HTML renderer that this editor does not call. That transitive version is flagged by [GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7). Until upstream updates its range, npm consumers can add this override to their application package.json:
+
+```json
+{
+  "overrides": {
+    "micromark-extension-math": {
+      "katex": "^0.19.1"
+    }
+  }
+}
+```
+
+The workspace and independent example use this override. Overrides in a library package are not inherited by consumers; the application must declare it. Test your application after changing dependency resolutions.
