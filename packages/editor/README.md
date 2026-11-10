@@ -83,6 +83,8 @@ function Example() {
 
 The host owns upload authentication, networking, and storage. The package validates PNG/JPEG/GIF/WebP, a 5 MB size limit, and the returned URL. Without a callback, the editor suggests inserting an image URL. Upload errors appear locally. Unmounting or enabling read-only mode before completion prevents insertion; the host request is not automatically cancelled.
 
+The default editor uses Markdown syntax support with list continuation and URL-paste handling. HTML tag completion and embedded HTML/CSS/JavaScript parsing are not loaded by default; hosts can supply additional language support through `extensions`. Preview syntax highlighting is unchanged.
+
 CodeMirror extensions are trusted application code. Do not accept scripts from document authors. Ensure host extensions use one compatible instance of `@codemirror/state`.
 
 ## MarkdownPreview
@@ -95,7 +97,13 @@ const headings = getHeadings('# Heading', prefix);
 <MarkdownPreview value="# Heading" headingPrefix={prefix} theme="light" />;
 ```
 
-Required prop: `value: string`. Optional props: `theme`, `className`, `style`, and `headingPrefix`. By default, each preview generates its own prefix with React `useId`; hosts must keep custom prefixes unique. `getHeadings(value, prefix = '')` returns `{ id, text, depth, line }[]` without reading the DOM.
+Required prop: `value: string`. Optional props: `theme`, `className`, `style`, `headingPrefix`, and `onHeadings`. By default, each preview generates its own prefix with React `useId`; hosts must keep custom prefixes unique. `getHeadings(value, prefix = '')` returns `{ id, text, depth, line }[]` without reading the DOM.
+
+### Reuse the rendered outline
+
+Pass `onHeadings={(headings) => ...}` to receive `{ id, text, depth, line }[]` after the preview commits. This reuses heading metadata from the rendered document and avoids a second Markdown parse. It fires when preview content or its heading prefix changes, not when the callback identity alone changes. Inline callbacks may safely store the result in parent state. It is a client-side callback; `getHeadings` remains available for standalone and server-side extraction.
+
+The workspace uses this callback and hides stale outlines while another document or preview revision is loading.
 
 ## Language
 

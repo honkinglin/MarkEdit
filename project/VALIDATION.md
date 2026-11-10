@@ -1,5 +1,11 @@
 # 验收记录
 
+## Performance update · 2026-11-10
+
+The P7 implementation and measurements are documented in [PERFORMANCE.md](PERFORMANCE.md). Unit coverage includes committed outline metadata and document replacement. Browser coverage adds desktop list continuation/undo, URL-paste handling, and outline navigation across layouts. Clipboard data is simulated explicitly because Firefox clears data in constructed ClipboardEvents; OS clipboard permissions and actual mobile IME input are not covered by this test.
+
+Final verification: 55 unit tests and 32 browser tests passed. Type checks, production builds, independent package consumption, package verification, the initial-JS budget, and tarball integrity checks passed. Browser latency is measured locally and is not a CI timing gate.
+
 ## English interface update · 2026-11-10
 
 - 53 unit tests passed, including English count formatting and preservation of existing multilingual drafts.

@@ -1,0 +1,392 @@
+{
+  "date": "2026-11-10",
+  "baselineCommit": "d150427",
+  "browser": {
+    "before": {
+      "label": "before",
+      "fixture": {
+        "bytes": 102400,
+        "sha256": "602b3561ebb0881dfcb1969ca30addd71d5beac5a1426088eb4c3917ac2b080d"
+      },
+      "environment": {
+        "node": "v24.14.0",
+        "platform": "darwin/arm64",
+        "browser": "158.0.8127.18",
+        "viewport": "1440x1000",
+        "cpuThrottling": false
+      },
+      "startup": {
+        "jsBytes": 1109136
+      },
+      "warmupEdits": 2,
+      "measuredEdits": 10,
+      "sourceFrameMs": {
+        "median": 24.149999998509884,
+        "p95": 32.100000001490116
+      },
+      "previewFrameMs": {
+        "median": 265.55000000074506,
+        "p95": 276.20000000298023
+      },
+      "longestTaskMs": {
+        "median": 0,
+        "p95": 0
+      },
+      "samples": [
+        {
+          "sourceFrameMs": 28.700000002980232,
+          "previewFrameMs": 263.1000000014901,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 30.69999999552965,
+          "previewFrameMs": 263.8999999985099,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 31.19999999552965,
+          "previewFrameMs": 265.5,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 19.19999999552965,
+          "previewFrameMs": 254.59999999403954,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 19.399999998509884,
+          "previewFrameMs": 269.8999999985099,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 16.799999997019768,
+          "previewFrameMs": 267.3999999985099,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 21.600000001490116,
+          "previewFrameMs": 255.39999999850988,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 32.100000001490116,
+          "previewFrameMs": 265.6000000014901,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 22.799999997019768,
+          "previewFrameMs": 273,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 25.5,
+          "previewFrameMs": 276.20000000298023,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        }
+      ],
+      "limitation": "Local Chromium, warm document, no CPU/network throttling. Mutation plus two animation frames approximates presentation; it is not an INP or pixel-paint measurement. Preview includes deliberate debounce. Startup bytes are decoded JS, not compressed network transfer."
+    },
+    "after": {
+      "label": "after",
+      "fixture": {
+        "bytes": 102400,
+        "sha256": "602b3561ebb0881dfcb1969ca30addd71d5beac5a1426088eb4c3917ac2b080d"
+      },
+      "environment": {
+        "node": "v24.14.0",
+        "platform": "darwin/arm64",
+        "browser": "158.0.8127.18",
+        "viewport": "1440x1000",
+        "cpuThrottlingRate": 1
+      },
+      "startup": {
+        "jsBytes": 926389
+      },
+      "warmupEdits": 2,
+      "measuredEdits": 10,
+      "sourceFrameMs": {
+        "median": 26.25,
+        "p95": 31
+      },
+      "previewFrameMs": {
+        "median": 245.35000000149012,
+        "p95": 266.1000000014901
+      },
+      "longestTaskMs": {
+        "median": 0,
+        "p95": 51
+      },
+      "samples": [
+        {
+          "sourceFrameMs": 31,
+          "previewFrameMs": 266.1000000014901,
+          "longTaskCount": 1,
+          "longestTaskMs": 51
+        },
+        {
+          "sourceFrameMs": 19.100000001490116,
+          "previewFrameMs": 253.30000000447035,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 24.600000001490116,
+          "previewFrameMs": 227.10000000149012,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 26.100000001490116,
+          "previewFrameMs": 228.60000000149012,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 20.600000001490116,
+          "previewFrameMs": 239.90000000596046,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 25.900000005960464,
+          "previewFrameMs": 244.80000000447035,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 26.899999998509884,
+          "previewFrameMs": 245.5,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 27.399999998509884,
+          "previewFrameMs": 246.20000000298023,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 28.600000001490116,
+          "previewFrameMs": 247.20000000298023,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        },
+        {
+          "sourceFrameMs": 26.399999998509884,
+          "previewFrameMs": 245.20000000298023,
+          "longTaskCount": 0,
+          "longestTaskMs": 0
+        }
+      ],
+      "limitation": "Local Chromium, warm document, configurable CPU throttling, no network throttling. Mutation plus two animation frames approximates presentation; it is not an INP or pixel-paint measurement. Preview includes deliberate debounce. Startup bytes are decoded JS, not compressed network transfer."
+    },
+    "before-cpu4": {
+      "label": "before-cpu4",
+      "fixture": {
+        "bytes": 102400,
+        "sha256": "602b3561ebb0881dfcb1969ca30addd71d5beac5a1426088eb4c3917ac2b080d"
+      },
+      "environment": {
+        "node": "v24.14.0",
+        "platform": "darwin/arm64",
+        "browser": "158.0.8127.18",
+        "viewport": "1440x1000",
+        "cpuThrottlingRate": 4
+      },
+      "startup": {
+        "jsBytes": 1109136
+      },
+      "warmupEdits": 2,
+      "measuredEdits": 10,
+      "sourceFrameMs": {
+        "median": 23.100000001490116,
+        "p95": 25.099999994039536
+      },
+      "previewFrameMs": {
+        "median": 363.75,
+        "p95": 404
+      },
+      "longestTaskMs": {
+        "median": 84.5,
+        "p95": 94
+      },
+      "samples": [
+        {
+          "sourceFrameMs": 22.200000002980232,
+          "previewFrameMs": 360.70000000298023,
+          "longTaskCount": 2,
+          "longestTaskMs": 82
+        },
+        {
+          "sourceFrameMs": 22.700000002980232,
+          "previewFrameMs": 389.70000000298023,
+          "longTaskCount": 2,
+          "longestTaskMs": 92
+        },
+        {
+          "sourceFrameMs": 22.299999997019768,
+          "previewFrameMs": 364.8999999985099,
+          "longTaskCount": 2,
+          "longestTaskMs": 85
+        },
+        {
+          "sourceFrameMs": 22.5,
+          "previewFrameMs": 362.6000000014901,
+          "longTaskCount": 2,
+          "longestTaskMs": 83
+        },
+        {
+          "sourceFrameMs": 23.600000001490116,
+          "previewFrameMs": 375.3999999985099,
+          "longTaskCount": 2,
+          "longestTaskMs": 88
+        },
+        {
+          "sourceFrameMs": 20.100000001490116,
+          "previewFrameMs": 362.30000000447035,
+          "longTaskCount": 2,
+          "longestTaskMs": 84
+        },
+        {
+          "sourceFrameMs": 25.099999994039536,
+          "previewFrameMs": 404,
+          "longTaskCount": 2,
+          "longestTaskMs": 94
+        },
+        {
+          "sourceFrameMs": 23.5,
+          "previewFrameMs": 377.19999999552965,
+          "longTaskCount": 2,
+          "longestTaskMs": 89
+        },
+        {
+          "sourceFrameMs": 24.900000005960464,
+          "previewFrameMs": 361.1000000014901,
+          "longTaskCount": 2,
+          "longestTaskMs": 82
+        },
+        {
+          "sourceFrameMs": 24.299999997019768,
+          "previewFrameMs": 360.79999999701977,
+          "longTaskCount": 2,
+          "longestTaskMs": 83
+        }
+      ],
+      "limitation": "Local Chromium, warm document, configurable CPU throttling, no network throttling. Mutation plus two animation frames approximates presentation; it is not an INP or pixel-paint measurement. Preview includes deliberate debounce. Startup bytes are decoded JS, not compressed network transfer."
+    },
+    "after-cpu4": {
+      "label": "after-cpu4",
+      "fixture": {
+        "bytes": 102400,
+        "sha256": "602b3561ebb0881dfcb1969ca30addd71d5beac5a1426088eb4c3917ac2b080d"
+      },
+      "environment": {
+        "node": "v24.14.0",
+        "platform": "darwin/arm64",
+        "browser": "158.0.8127.18",
+        "viewport": "1440x1000",
+        "cpuThrottlingRate": 4
+      },
+      "startup": {
+        "jsBytes": 926389
+      },
+      "warmupEdits": 2,
+      "measuredEdits": 10,
+      "sourceFrameMs": {
+        "median": 25.25,
+        "p95": 29.30000000447035
+      },
+      "previewFrameMs": {
+        "median": 301.3500000014901,
+        "p95": 319.19999999552965
+      },
+      "longestTaskMs": {
+        "median": 85.5,
+        "p95": 110
+      },
+      "samples": [
+        {
+          "sourceFrameMs": 25,
+          "previewFrameMs": 316.3999999985099,
+          "longTaskCount": 1,
+          "longestTaskMs": 89
+        },
+        {
+          "sourceFrameMs": 25.100000001490116,
+          "previewFrameMs": 316,
+          "longTaskCount": 1,
+          "longestTaskMs": 99
+        },
+        {
+          "sourceFrameMs": 29.200000002980232,
+          "previewFrameMs": 303.20000000298023,
+          "longTaskCount": 1,
+          "longestTaskMs": 87
+        },
+        {
+          "sourceFrameMs": 29.30000000447035,
+          "previewFrameMs": 302.80000000447035,
+          "longTaskCount": 1,
+          "longestTaskMs": 85
+        },
+        {
+          "sourceFrameMs": 26.299999997019768,
+          "previewFrameMs": 295.8999999985099,
+          "longTaskCount": 1,
+          "longestTaskMs": 86
+        },
+        {
+          "sourceFrameMs": 25.399999998509884,
+          "previewFrameMs": 298.3999999985099,
+          "longTaskCount": 1,
+          "longestTaskMs": 84
+        },
+        {
+          "sourceFrameMs": 17.599999994039536,
+          "previewFrameMs": 292.3999999985099,
+          "longTaskCount": 1,
+          "longestTaskMs": 83
+        },
+        {
+          "sourceFrameMs": 27.69999999552965,
+          "previewFrameMs": 299.8999999985099,
+          "longTaskCount": 1,
+          "longestTaskMs": 82
+        },
+        {
+          "sourceFrameMs": 19.399999998509884,
+          "previewFrameMs": 289,
+          "longTaskCount": 1,
+          "longestTaskMs": 84
+        },
+        {
+          "sourceFrameMs": 24.799999997019768,
+          "previewFrameMs": 319.19999999552965,
+          "longTaskCount": 1,
+          "longestTaskMs": 110
+        }
+      ],
+      "limitation": "Local Chromium, warm document, configurable CPU throttling, no network throttling. Mutation plus two animation frames approximates presentation; it is not an INP or pixel-paint measurement. Preview includes deliberate debounce. Startup bytes are decoded JS, not compressed network transfer."
+    }
+  },
+  "bundle": {
+    "before": {
+      "initialJsBytes": 1079507,
+      "initialJsGzipBytes": 354813
+    },
+    "after": {
+      "initialJsBytes": 896760,
+      "initialJsGzipBytes": 287093
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { messages } from './i18n';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
   ArrowDownToLine,
@@ -33,7 +33,6 @@ import { useScrollSync } from './hooks/useScrollSync';
 import { useWorkspace } from './hooks/useWorkspace';
 import { markdownFilename } from './lib/draft';
 import { exportBackup } from './lib/documents';
-import { getHeadings } from './lib/headings';
 import type { Heading } from './lib/headings';
 
 type Mode = 'edit' | 'split' | 'preview';
@@ -86,7 +85,17 @@ export default function App() {
     preview,
     active?.id,
   );
-  const headings = useMemo(() => getHeadings(preview), [preview]);
+  const [outline, setOutline] = useState<{
+    content: string;
+    headings: Heading[];
+  }>({ content: '', headings: [] });
+  const receiveHeadings = useCallback(
+    (headings: Heading[]) => {
+      setOutline({ content: preview, headings });
+    },
+    [preview],
+  );
+  const headings = outline.content === preview ? outline.headings : [];
 
   useEffect(() => {
     try {
@@ -463,7 +472,7 @@ export default function App() {
                     </span>
                   </div>
                   <div className="preview-scroll" ref={previewContainer} onScroll={onPreviewScroll}>
-                    <MarkdownPreview value={preview} />
+                    <MarkdownPreview value={preview} onHeadings={receiveHeadings} />
                   </div>
                 </section>
               </div>

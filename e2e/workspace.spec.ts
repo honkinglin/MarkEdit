@@ -120,3 +120,48 @@ test.describe('English defaults', () => {
     await expect(page.locator('body')).not.toContainText(/[\u3400-\u9fff]/);
   });
 });
+
+test('Desktop Markdown commands and responsive outline navigation', async ({ page, isMobile }) => {
+  await ready(page);
+  const input = page.getByRole('textbox', { name: 'Markdown source', exact: true });
+  // Android emulation does not reproduce a physical/IME Enter key.
+  // Desktop commands are checked here; outline navigation is checked on every project.
+  if (!isMobile) {
+    await replaceMarkdown(page, 'Markdown source', '- first');
+    await input.press('End');
+    await input.press('Enter');
+    await expect(input).toContainText('- first');
+    await input.pressSequentially('second');
+    await expect(page.locator('.markdown-body li')).toHaveText(['first', 'second']);
+    await input.press('ControlOrMeta+z');
+    await expect(page.locator('.markdown-body')).not.toContainText('second');
+
+    await replaceMarkdown(page, 'Markdown source', 'website');
+    await expect(page.locator('.markdown-body')).toHaveText('website');
+    await input.press('ControlOrMeta+a');
+    await expect
+      .poll(() => page.evaluate(() => document.getSelection()?.toString()))
+      .toBe('website');
+    await input.evaluate((element) => {
+      const data = new DataTransfer();
+      data.setData('text/plain', 'https://example.com');
+      // Firefox clears clipboardData in a synthetic ClipboardEvent constructor.
+      // Supply test data explicitly; this tests URL-paste handling, not OS permissions.
+      const event = new Event('paste', { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'clipboardData', { value: data });
+      element.dispatchEvent(event);
+    });
+    await expect(page.locator('.markdown-body a')).toHaveAttribute('href', 'https://example.com');
+  }
+  await replaceMarkdown(page, 'Markdown source', '# Repeated\n\n## Repeated\n\n## Last');
+  const toggle = page.getByRole('button', { name: 'Document outline', exact: true });
+  if ((await toggle.getAttribute('aria-pressed')) !== 'true') await toggle.click();
+  const outline = page.getByRole('navigation', { name: 'Document outline' });
+  await expect(outline.getByRole('button')).toHaveText(['Repeated', 'Repeated', 'Last']);
+  await outline.getByRole('button', { name: 'Last', exact: true }).click();
+  await expect(input).toBeFocused();
+  const ids = await page
+    .locator('.markdown-body h1, .markdown-body h2')
+    .evaluateAll((nodes) => nodes.map((node) => node.id));
+  expect(new Set(ids).size).toBe(3);
+});

@@ -31,7 +31,14 @@ export function annotateHeadings(tree: Root, prefix = ''): Heading[] {
     let suffix = 1;
     while (used.has(id)) id = `${base}-${suffix++}`;
     used.add(id);
-    node.data = { ...node.data, hProperties: { ...node.data?.hProperties, id } };
+    node.data = {
+      ...node.data,
+      hProperties: {
+        ...node.data?.hProperties,
+        id,
+        'data-heading-text': text || messages.untitled,
+      },
+    };
     headings.push({
       id,
       text: text || messages.untitled,

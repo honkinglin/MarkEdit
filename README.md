@@ -124,7 +124,13 @@ npm run test:e2e
 # Performance measurements and artifact / dependency license reports
 npm run benchmark
 npm run release:report
+
+# Production browser timing and initial bundle analysis
+npm run benchmark:bundle -- current
+npm run benchmark:browser -- current 4
 ```
+
+See the [performance report](project/PERFORMANCE.md) for the 100 KB fixture, before/after measurements, and remaining main-thread limits.
 
 ## Roadmap and contributions
 

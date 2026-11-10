@@ -11,17 +11,17 @@ Reviewed on 2026-11-10 against the current implementation and development roadma
 - Open-source foundations: MIT license, CI, API documentation, architecture records, reproducible checks, screenshots, and a Vercel Git integration.
 - English interface: localized UI catalogs, accessible names, notifications, error messages, new-document templates, English formatting, and English READMEs. Existing content is preserved.
 
-The English implementation is currently a local change. It must be committed and pushed before GitHub CI and the Vercel Git integration can validate and deploy it. A successful earlier remote build does not validate these new changes.
+The English implementation is committed as `d150427`. The first performance pass is implemented locally: it reuses preview headings, removes eager embedded HTML language support, adds browser measurements, and introduces a CI bundle budget. See [PERFORMANCE.md](PERFORMANCE.md). These performance changes have not yet been committed or deployed.
 
 ## Remaining work, in recommended order
 
-| Priority | Work                                         | Completion criteria                                                                                                                                                                                                                          |
-| -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1        | Long-document performance and bundle size    | Measure browser input-to-preview latency and long tasks on a reproducible 100 KB fixture; reduce initial loading and unnecessary rendering; record before/after results. Current SSR timings do not prove interactive performance.           |
-| 2        | Package and release publication              | Confirm an available npm name and publishing account, choose a version, review dependency notices, publish a tested tarball, and create a GitHub release. The package is intentionally still private.                                        |
-| 3        | Broader browser and accessibility validation | Test actual Safari/iOS/Android, IME composition, system clipboard permissions, keyboard and screen-reader flows, quota exhaustion, and crash recovery. Playwright WebKit and emulated mobile viewports are not substitutes for all of these. |
-| 4        | Open-source presentation                     | Record a short demo video/GIF and translate the remaining contribution, architecture, roadmap, and release records. The root, package, and example READMEs are already English.                                                              |
-| 5        | Optional integrations                        | Provide a documented real image-upload adapter and validate a client-boundary example in an SSR framework. These should not require a backend for the standalone workspace.                                                                  |
+| Priority | Work                                         | Completion criteria                                                                                                                                                                                                                           |
+| -------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Remaining long-task and loading work         | The first measured pass reduced initial gzip JS by 19.1% and throttled preview latency by 17.2%. Synchronous long tasks and large on-demand diagram chunks remain; investigate worker parsing or incremental rendering with broader fixtures. |
+| 2        | Package and release publication              | Confirm an available npm name and publishing account, choose a version, review dependency notices, publish a tested tarball, and create a GitHub release. The package is intentionally still private.                                         |
+| 3        | Broader browser and accessibility validation | Test actual Safari/iOS/Android, IME composition, system clipboard permissions, keyboard and screen-reader flows, quota exhaustion, and crash recovery. Playwright WebKit and emulated mobile viewports are not substitutes for all of these.  |
+| 4        | Open-source presentation                     | Record a short demo video/GIF and translate the remaining contribution, architecture, roadmap, and release records. The root, package, and example READMEs are already English.                                                               |
+| 5        | Optional integrations                        | Provide a documented real image-upload adapter and validate a client-boundary example in an SSR framework. These should not require a backend for the standalone workspace.                                                                   |
 
 ## Deliberate scope boundaries
 
@@ -31,4 +31,4 @@ The English implementation is currently a local change. It must be committed and
 - An offline service worker is not implemented. Local document storage does not guarantee that the application can cold-start offline.
 - Emoji shortcuts and nonstandard Markdown dialects are not part of the current core contract.
 
-Recommended next development phase: browser performance measurement followed by targeted rendering and loading improvements, then package publication.
+Next milestone: prepare package publication and a formal release, while tracking long-task improvements as a separate measured workstream. Publishing still requires an available npm package name and account.

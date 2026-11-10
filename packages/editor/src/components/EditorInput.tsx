@@ -2,10 +2,10 @@ import { messages } from '../i18n';
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import CodeMirror, { ExternalChange } from '@uiw/react-codemirror';
-import type { Extension } from '@codemirror/state';
+import { Prec, type Extension } from '@codemirror/state';
 import type { ToolbarItem } from '../types';
-import { markdown } from '@codemirror/lang-markdown';
-import { EditorView } from '@codemirror/view';
+import { markdownLanguage, markdownKeymap, pasteURLAsLink } from '@codemirror/lang-markdown';
+import { EditorView, keymap } from '@codemirror/view';
 import { Bold, Italic, Heading2, Quote, List, Link, Code2, Table2, ImagePlus } from 'lucide-react';
 import { InsertDialog } from './InsertDialog';
 import type { InsertKind } from './InsertDialog';
@@ -119,7 +119,10 @@ export function EditorInput({
   const extensions = useMemo(
     () => [
       ...extraExtensions,
-      markdown(),
+      // Markdown-only syntax support avoids eagerly loading HTML/CSS/JS parsers.
+      markdownLanguage,
+      Prec.high(keymap.of(markdownKeymap)),
+      pasteURLAsLink,
       EditorView.lineWrapping,
       EditorView.contentAttributes.of({ 'aria-label': ariaLabel }),
       EditorView.updateListener.of((update) => {

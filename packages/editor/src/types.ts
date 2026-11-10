@@ -1,5 +1,6 @@
 import type { CSSProperties, Ref } from 'react';
 import type { Extension } from '@codemirror/state';
+import type { Heading } from './lib/headings';
 import type { UploadImage } from './lib/insertions';
 export type EditorTheme = 'light' | 'dark';
 export type EditorMode = 'edit' | 'split' | 'preview';
@@ -39,4 +40,6 @@ export interface MarkdownPreviewProps {
   style?: CSSProperties;
   /** Defaults to a unique prefix per mounted preview. Use getHeadings(value, prefix) for a matching outline. */
   headingPrefix?: string;
+  /** Receives headings from the committed preview without parsing Markdown again. */
+  onHeadings?: (headings: Heading[]) => void;
 }

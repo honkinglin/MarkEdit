@@ -1,5 +1,5 @@
 import { messages } from '../i18n';
-import { memo, useId, useMemo } from 'react';
+import { memo, useEffect, useId, useMemo, useRef } from 'react';
 import type { MarkdownPreviewProps } from '../types';
 import { remarkHeadings } from '../lib/headings';
 import type { PluggableList } from 'unified';
@@ -63,7 +63,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   className = '',
   style,
   headingPrefix,
+  onHeadings,
 }: MarkdownPreviewProps) {
+  const article = useRef<HTMLElement>(null);
+  const reported = useRef<{ value: string; prefix: string } | null>(null);
   const id = useId();
   const prefix = headingPrefix ?? `markedit-${id}-`;
   const plugins = useMemo<PluggableList>(
@@ -73,9 +76,29 @@ export const MarkdownPreview = memo(function MarkdownPreview({
       ),
     [prefix],
   );
+  useEffect(() => {
+    if (!onHeadings || !article.current) {
+      reported.current = null;
+      return;
+    }
+    // Inline parent callbacks may set state. Only publish when the preview changes.
+    if (reported.current?.value === value && reported.current.prefix === prefix) return;
+    reported.current = { value, prefix };
+    const nodes = article.current.querySelectorAll<HTMLElement>(
+      'h1[data-heading-text],h2[data-heading-text],h3[data-heading-text],h4[data-heading-text],h5[data-heading-text],h6[data-heading-text]',
+    );
+    onHeadings(
+      Array.from(nodes, (node) => ({
+        id: node.id,
+        text: node.dataset.headingText ?? '',
+        depth: Number(node.tagName.slice(1)),
+        line: Number(node.dataset.sourceLine ?? 1),
+      })),
+    );
+  }, [value, prefix, onHeadings]);
   return (
     <div className={`markedit markedit-preview ${className}`} data-theme={theme} style={style}>
-      <article className="markdown-body" aria-label={messages.markdownPreview}>
+      <article ref={article} className="markdown-body" aria-label={messages.markdownPreview}>
         <Markdown remarkPlugins={plugins} components={components} skipHtml>
           {value}
         </Markdown>

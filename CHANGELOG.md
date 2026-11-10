@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Performance foundations
+
+- Reuse committed preview headings through `MarkdownPreview.onHeadings`, avoiding duplicate workspace parsing.
+- Load Markdown editing without eager embedded HTML/CSS/JavaScript parsers. Default HTML tag completion is removed; host extensions remain supported.
+- Add production browser latency/long-task measurements and initial bundle module reports.
+- Enforce a 320 KB initial gzip JavaScript budget in CI; record measured before/after results.
+- Cover outline metadata, desktop list continuation, undo, simulated URL paste, and responsive outline navigation.
+
 ## Unreleased — English interface
 
 - English defaults across the workspace, reusable editor, insertion dialogs, accessibility labels, errors, and consumer example.

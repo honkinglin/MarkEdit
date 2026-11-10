@@ -23,6 +23,7 @@ jobs:
             examples/react-consumer/package-lock.json
       - run: npm ci
       - run: npm run check
+      - run: npm run check:bundle
       - run: npm run example:setup
       - run: npm run example:build
       - run: npx playwright install --with-deps chromium firefox webkit
@@ -37,6 +38,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            .benchmarks/bundle-ci.json
             .benchmarks/report.json
             .benchmarks/release-report.json
             .benchmarks/third-party-notices.json

@@ -21,7 +21,10 @@
     "check": "npm run format:check && npm run typecheck && npm test && npm run build && npm run verify:lib",
     "test:e2e": "playwright test",
     "test:e2e:list": "playwright test --list",
-    "release:report": "node scripts/release-report.mjs"
+    "release:report": "node scripts/release-report.mjs",
+    "benchmark:browser": "node scripts/benchmark-browser.mjs",
+    "benchmark:bundle": "node scripts/analyze-build.mjs",
+    "check:bundle": "node scripts/analyze-build.mjs ci --check"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.0",
