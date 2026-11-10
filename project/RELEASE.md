@@ -1,6 +1,6 @@
 # 发布检查表
 
-当前处于本地发布准备阶段。`private: true` 有意保留，CI 不包含发布凭证、npm publish 或部署步骤。
+工作台已部署到 [Vercel 演示站](https://markedit-seven.vercel.app)。`private: true` 有意保留，CI 不包含发布凭证、npm publish 或部署步骤。
 
 ## 可复现的候选版本
 
@@ -17,7 +17,7 @@
 - GitHub 仓库：`honkinglin/MarkEdit`；npm 包名可用性、发布账号和版本号仍待确认。
 - 本项目已采用 MIT，署名 honkinglin and contributors；组件包同时包含 LICENSE。
 - 审阅第三方依赖许可及字体许可；自动清单不代替许可审核。KaTeX 许可已随组件字体产物保留。
-- Vercel 团队：`Kyrie Lin's projects`（Hobby），拟用项目名 `markedit`，导入 `honkinglin/MarkEdit` 的 `main` 分支；尚未创建或上线。
+- Vercel 团队：`Kyrie Lin's projects`（Hobby），项目 `markedit` 已关联 `honkinglin/MarkEdit` 的 `main` 分支并上线。
 - 更新包 README、CHANGELOG、repository、license、版本与消费项目依赖；再解除组件包 `private`。
 
 ## 静态演示部署参数
@@ -32,4 +32,4 @@
 
 Playwright 的 WebKit 不等同于真实 Safari 全矩阵；移动视口不等同于真机。真实中文输入法组合输入、系统剪贴板权限、浏览器配额耗尽、浏览器崩溃和上传后端还需人工验收。测试中的中文填入不能证明输入法兼容性。
 
-根目录 `vercel.json` 已声明 Vite、npm ci、npm run build 和 dist。将本次修改提交并推送后，可在上述团队导入仓库；不会从验证 CI 自动发布。
+根目录 `vercel.json` 已声明 Vite、npm ci、npm run build 和 dist。已启用 Vercel Git 集成，推送 main 会触发生产部署；GitHub 验证 CI 本身不包含部署步骤。

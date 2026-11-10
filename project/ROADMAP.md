@@ -100,7 +100,7 @@ P4 已拆出 `packages/editor`；工作台保留根目录入口，独立消费�
 
 ### P5 · 作品展示与发布准备（进行中，公开发布待确认）
 
-CI、E2E 流程、贡献指南、架构和发布报告已实现。GitHub 仓库为 honkinglin/MarkEdit，已采用 MIT，Vercel 演示配置已准备。线上部署、npm 与正式 release 尚未完成。验收范围见 [VALIDATION.md](VALIDATION.md)。
+CI、E2E 流程、贡献指南、架构和发布报告已实现。GitHub 仓库为 honkinglin/MarkEdit，已采用 MIT，[Vercel 演示](https://markedit-seven.vercel.app)已上线。npm 与正式 release 尚未完成。验收范围见 [VALIDATION.md](VALIDATION.md)。
 
 - CI：类型检查、测试、构建；补充 Playwright 核心流程和键盘可访问性检查。
 - Chrome/Firefox/Safari 与窄屏检查，中文输入法、长文、剪贴板和下载测试。

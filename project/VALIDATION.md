@@ -19,9 +19,11 @@
 
 ## 远端与发布状态
 
-GitHub 已公开：<https://github.com/honkinglin/MarkEdit>。已检查的提交 `56efac0` 的 [CI 运行](https://github.com/honkinglin/MarkEdit/actions/runs/42751576638) 中，格式/类型/单元测试/构建通过，E2E 失败；上述修复尚未推送，不能将本地结果描述为远端 CI 已通过。
+GitHub 已公开：<https://github.com/honkinglin/MarkEdit>。已修复的版本为 `c720478`；[对应 CI](https://github.com/honkinglin/MarkEdit/actions/runs/42754872603) 在本次部署检查时仍在运行，本地通过不代替远端结果。
 
-本项目与组件包使用 MIT。Vercel 根目录配置已准备，拟部署到 Kyrie Lin's projects 的 `markedit`；项目尚未创建，也没有线上演示 URL。组件仍为 private，尚未发布 npm 或正式 GitHub release。
+本项目与组件包使用 MIT。Vercel 项目 `markedit` 已创建在 Kyrie Lin's projects 团队，生产部署 `dpl_BSLFRxTB2bth5k8mB4kf6gDsNFoK` 状态 READY，构建提交 `c720478`，构建约 49 秒。
+
+演示站：<https://markedit-seven.vercel.app>。线上 Chromium 验证公开 HTTP 200、中文编辑/保存/刷新恢复、Markdown 下载内容一致、390px 窄屏无横向溢出，未发现 pageerror。此验证使用全新浏览器上下文，没有修改用户已有文档。已关联 GitHub main，后续推送由 Vercel 自动构建。组件仍为 private，尚未发布 npm 或正式 GitHub release。
 
 ## 人工验收与展示
 
