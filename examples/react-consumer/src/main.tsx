@@ -22,7 +22,6 @@ function App() {
           <h1>一个编辑器，融入你的应用。</h1>
           <p>受控输入、独立预览和可组合的编辑能力。</p>
         </div>
-        <a href="https://github.com/pandao/editor.md">灵感来自 Editor.md ↗</a>
       </header>
       <section className="demo-controls" aria-label="组件配置">
         <label>

@@ -18,7 +18,7 @@ const measure = (fn: () => unknown) => {
     return performance.now() - start;
   }).sort((a, b) => a - b);
   return {
-    medianMs: Number(samples[10].toFixed(2)),
+    medianMs: Number(((samples[9] + samples[10]) / 2).toFixed(2)),
     p95Ms: Number(samples[18].toFixed(2)),
     runs: samples.length,
   };

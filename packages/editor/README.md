@@ -83,7 +83,7 @@ function Example() {
 
 上传回调由宿主负责鉴权、网络请求与存储。本包仅校验 PNG/JPEG/GIF/WebP、最大 5 MB，以及返回 URL；没有上传回调时提示使用图片 URL。上传失败显示局部提示，卸载或完成前切换只读不会插入；不主动取消宿主网络请求。
 
-`extensions` 是 CodeMirror 6 扩展，不是旧 Editor.md 的插件路径。扩展属于可信应用代码，能改变编辑行为；不要接收文档作者提供的任意脚本。使用宿主自定义扩展时保证 `@codemirror/state` 只有一个兼容实例。
+`extensions` 使用 CodeMirror 6 的扩展模型。扩展属于可信应用代码，能改变编辑行为；不要接收文档作者提供的任意脚本。使用宿主自定义扩展时保证 `@codemirror/state` 只有一个兼容实例。
 
 ## MarkdownPreview
 
@@ -109,4 +109,4 @@ const headings = getHeadings('# 标题', prefix);
 
 默认忽略原始 HTML。公式采用 `trust: false` 并限制展开；图表使用 strict、禁用文档内配置，SVG 经过清理。错误公式/图表只影响对应区块。外部图片会由浏览器请求，宿主需自行提供网络隐私策略。
 
-参考原项目的 [实例与配置示例](https://github.com/pandao/editor.md/blob/master/examples/use-requirejs.html) 和 [只读示例](https://github.com/pandao/editor.md/blob/master/examples/readonly.html)，将 `getMarkdown`、内容设置、工具栏与预览控制转为 React props/ref。未复制其实现，不兼容 jQuery/AMD API、旧 `flow` / `seq`、`[TOC]` 等非标准指令；图表使用 Mermaid，目录使用 `getHeadings`。
+组件通过 React props/ref 管理正文、工具栏和编辑命令；图表使用 Mermaid，目录由 `getHeadings` 提取。非标准 `flow` / `seq` 和 `[TOC]` 指令不在支持范围内。

@@ -32,10 +32,6 @@ body {
   color: #6d7d72;
   margin: 0;
 }
-.demo-header a {
-  color: #426d55;
-  text-decoration: none;
-}
 .demo-controls {
   display: flex;
   flex-wrap: wrap;

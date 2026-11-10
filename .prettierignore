@@ -5,3 +5,6 @@ package-lock.json
 *.tsbuildinfo
 
 .benchmarks/
+
+playwright-report/
+test-results/

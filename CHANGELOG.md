@@ -1,0 +1,28 @@
+# Changelog
+
+## Unreleased — P5 发布准备
+
+- GitHub Actions 校验流程：格式、类型、单元测试、工作台与组件包构建、独立 tarball 消费、跨浏览器 E2E。
+- Chromium、Firefox、WebKit 与移动视口测试配置；中文保存/下载、备份往返、键盘对话框、公式图表、组件契约流程。
+- 架构说明、贡献指南、发布检查表、版本记录与可提交的真实截图。
+- 发布报告记录构建文件大小、tarball 摘要、消费包一致性和已解析生产依赖许可清单。
+
+本版本未公开发布；阶段状态与已知限制见[开发路线图](project/ROADMAP.md)。
+
+## 0.1.0 — 本地开发里程碑
+
+### P4 · 可复用组件
+
+React 19 编辑器/预览 API、受控与非受控、只读、扩展、ref 命令、样式作用域、独立消费示例。
+
+### P3 · Markdown 扩展
+
+KaTeX、Mermaid、语言高亮、滚动同步、插入面板、图片回调与长文性能记录。
+
+### P2 · 个人工作台
+
+IndexedDB 多文档、目录、版本快照、回收站、跨标签同步和备份恢复。
+
+### P1 · 基础编辑
+
+React/TypeScript/Vite、CodeMirror 6、GFM 预览、主题与视图切换、单草稿保存、Markdown 导入导出和 Prettier。

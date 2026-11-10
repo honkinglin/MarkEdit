@@ -5,3 +5,6 @@ dist/
 docs
 
 .benchmarks/
+
+playwright-report/
+test-results/
