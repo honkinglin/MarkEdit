@@ -2,7 +2,7 @@
 
 React 19 + TypeScript Markdown 编辑器与独立预览组件。基于 CodeMirror 6，支持 GFM、KaTeX、Mermaid 和按需代码高亮。实现不依赖工作台、IndexedDB 或 localStorage。
 
-当前为本地打包验证版本，`private: true`，尚未发布 npm。包名与开源许可将在发布阶段确认。只输出 ESM 与 TypeScript 声明；需要支持 CSS 和动态 import 的打包器。交互组件面向浏览器；Next.js 等环境需在客户端边界使用，未完成 SSR 框架兼容验收。
+当前为本地打包验证版本，`private: true`，尚未发布 npm。采用 MIT 许可；正式 npm 包名和发布账号仍待确认。只输出 ESM 与 TypeScript 声明；需要支持 CSS 和动态 import 的打包器。交互组件面向浏览器；Next.js 等环境需在客户端边界使用，未完成 SSR 框架兼容验收。
 
 ## 安装本地构建
 

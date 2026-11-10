@@ -45,7 +45,7 @@ src/
   lib/draft.ts                  # 草稿结构、验证、持久化边界
   App.tsx                       # 工作台、导入导出、保存状态
   styles.css                    # 设计令牌与响应式布局
-docs/                           # 计划、验收和架构决策
+project/                        # 计划、验收和架构决策
 ```
 
 P4 已拆出 `packages/editor`；工作台保留根目录入口，独立消费项目放在 `examples/react-consumer`。它使用独立依赖树安装 tarball，便于检验真实包边界。
@@ -100,7 +100,7 @@ P4 已拆出 `packages/editor`；工作台保留根目录入口，独立消费�
 
 ### P5 · 作品展示与发布准备（进行中，公开发布待确认）
 
-CI、E2E 流程、贡献指南、架构和发布报告已实现。远端仓库和发布目标尚待确认，因此本阶段尚未标记为公开 v1.0 发布完成。
+CI、E2E 流程、贡献指南、架构和发布报告已实现。GitHub 仓库为 honkinglin/MarkEdit，已采用 MIT，Vercel 演示配置已准备。线上部署、npm 与正式 release 尚未完成。验收范围见 [VALIDATION.md](VALIDATION.md)。
 
 - CI：类型检查、测试、构建；补充 Playwright 核心流程和键盘可访问性检查。
 - Chrome/Firefox/Safari 与窄屏检查，中文输入法、长文、剪贴板和下载测试。

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import postcss from 'postcss';
+assert.equal(await readFile('packages/editor/LICENSE', 'utf8'), await readFile('LICENSE', 'utf8'));
 const base = 'packages/editor/dist';
 for (const name of ['style.css', 'lib/math.css']) {
   const file = path.join(base, name);

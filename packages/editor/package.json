@@ -5,7 +5,8 @@
   "type": "module",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -44,5 +45,12 @@
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json && node scripts/math-css.mjs"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/honkinglin/MarkEdit.git",
+    "directory": "packages/editor"
+  },
+  "description": "React Markdown editor and preview with CodeMirror 6, math and diagrams"
 }

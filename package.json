@@ -67,5 +67,13 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/honkinglin/MarkEdit.git"
+  },
+  "engines": {
+    "node": "24.x"
+  }
 }

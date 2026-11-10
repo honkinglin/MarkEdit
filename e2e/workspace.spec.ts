@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { replaceMarkdown } from './helpers';
 
 async function ready(page: Page) {
   await page.goto('/');
@@ -15,7 +16,7 @@ async function command(page: Page, label: string) {
 test('中文编辑、保存、刷新与 Markdown 下载', async ({ page }, info) => {
   await ready(page);
   const source = '# 发布验收\n\n中文内容与 **格式**。\n\n## 第二节\n\n- [x] 完成';
-  await page.getByRole('textbox', { name: 'Markdown 源码' }).fill(source);
+  await replaceMarkdown(page, 'Markdown 源码', source);
   await page.getByRole('textbox', { name: '文档名称' }).fill('发布验收.md');
   await command(page, '保存当前文档');
   await expect(page.getByText('已保存当前文档', { exact: true })).toBeVisible();
@@ -40,7 +41,9 @@ test('命令菜单键盘路径与对话框焦点', async ({ page }) => {
   await page.getByRole('textbox', { name: '搜索命令' }).press('Enter');
   await expect(dialog).not.toBeVisible();
   await expect(page.getByText('已新建文档', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '链接', exact: true }).click();
+  const linkButton = page.getByRole('button', { name: '链接', exact: true });
+  await linkButton.focus();
+  await linkButton.press('Enter');
   await expect(page.getByRole('dialog', { name: '插入链接' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: '插入链接' })).not.toBeVisible();
@@ -49,7 +52,7 @@ test('命令菜单键盘路径与对话框焦点', async ({ page }) => {
 
 test('备份再导入创建独立副本', async ({ page }) => {
   await ready(page);
-  await page.getByRole('textbox', { name: 'Markdown 源码' }).fill('# 备份往返\n\n唯一内容');
+  await replaceMarkdown(page, 'Markdown 源码', '# 备份往返\n\n唯一内容');
   const downloaded = page.waitForEvent('download');
   await command(page, '备份全部文档与历史');
   const backup = await downloaded;
@@ -71,14 +74,14 @@ test('备份再导入创建独立副本', async ({ page }) => {
 
 test('扩展渲染与非法图表局部回退', async ({ page }) => {
   await ready(page);
-  await page
-    .getByRole('textbox', { name: 'Markdown 源码' })
-    .fill('# 扩展验收\n\n公式 $x^2$\n\n```mermaid\nflowchart LR\n A[写作] --> B[预览]\n```');
+  await replaceMarkdown(
+    page,
+    'Markdown 源码',
+    '# 扩展验收\n\n公式 $x^2$\n\n```mermaid\nflowchart LR\n A[写作] --> B[预览]\n```',
+  );
   await expect(page.locator('.katex')).toBeVisible();
   await expect(page.getByRole('img', { name: 'Mermaid 图表' })).toBeVisible();
-  await page
-    .getByRole('textbox', { name: 'Markdown 源码' })
-    .fill('# 正文仍然可用\n\n```mermaid\nnot-a-diagram\n```');
+  await replaceMarkdown(page, 'Markdown 源码', '# 正文仍然可用\n\n```mermaid\nnot-a-diagram\n```');
   await expect(page.getByText('图表暂时无法渲染', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: '正文仍然可用' })).toBeVisible();
 });

@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { replaceMarkdown } from './helpers';
 
 test('tarball 受控更新、只读与实例重挂', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('http://127.0.0.1:4174');
   const input = page.getByRole('textbox', { name: '受控 Markdown 源码' });
-  await input.fill('# 独立包验收');
+  await replaceMarkdown(page, '受控 Markdown 源码', '# 独立包验收');
   await expect(page.getByRole('heading', { name: '独立包验收' })).toBeVisible();
   await page.getByRole('button', { name: '父组件重置' }).click();
   await expect(page.getByRole('heading', { name: '父组件重置', exact: true })).toBeVisible();
@@ -13,7 +14,7 @@ test('tarball 受控更新、只读与实例重挂', async ({ page }) => {
   await expect(input).toHaveAttribute('contenteditable', 'false');
   await expect(page.getByRole('button', { name: 'ref 插入文字' })).toBeDisabled();
   await page.getByRole('combobox', { name: '主题' }).selectOption('dark');
-  await page.getByRole('textbox', { name: '独立 Markdown 源码' }).fill('# 另一份内容');
+  await replaceMarkdown(page, '独立 Markdown 源码', '# 另一份内容');
   await expect(page.getByRole('heading', { name: '父组件重置', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '卸载实例' }).click();
   await expect(page.getByRole('textbox', { name: '独立 Markdown 源码' })).toHaveCount(0);

@@ -4,7 +4,7 @@
 
 ![MarkEdit 工作台](assets/workbench.png)
 
-> **项目状态：** 本地开发中，尚未部署在线演示或发布 npm；项目许可证尚未确定。
+> **项目状态：** 本地开发中，尚未部署在线演示或发布 npm；采用 MIT 许可。
 
 [组件文档](packages/editor/README.md) · [架构说明](project/ARCHITECTURE.md) · [路线图](project/ROADMAP.md) · [贡献指南](CONTRIBUTING.md)
 
@@ -79,6 +79,8 @@ npm run check
 该命令检查格式、类型、单元测试、工作台构建和组件包。运行端到端测试前，先安装 Playwright 浏览器：
 
 ```bash
+npm run example:setup
+npm run example:build
 npx playwright install chromium firefox webkit
 npm run test:e2e
 ```
@@ -91,6 +93,7 @@ GitHub Actions 配置位于 `.github/workflows/ci.yml`，用于校验并保存�
 - [架构说明](project/ARCHITECTURE.md)
 - [开发路线图](project/ROADMAP.md)
 - [发布检查表](project/RELEASE.md)
+- [验收记录与覆盖范围](project/VALIDATION.md)
 - [版本记录](CHANGELOG.md)
 - [第三方声明](THIRD_PARTY_NOTICES.md)
 
@@ -100,4 +103,4 @@ GitHub Actions 配置位于 `.github/workflows/ci.yml`，用于校验并保存�
 - 文档数据保存在本地浏览器，不是云端备份。
 - 大型文档的预览更新和 Mermaid 相关依赖体积仍有优化空间。
 - 图片上传服务、SSR 框架兼容及完整浏览器和输入法矩阵尚未完成验收。
-- 项目许可证尚未确定；正式开源前需补齐许可与发布流程。
+- 本项目采用 [MIT 许可](LICENSE)；npm 正式发布和 Vercel 上线仍待完成。

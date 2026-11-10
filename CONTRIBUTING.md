@@ -34,4 +34,4 @@ npm run release:report
 
 PR 描述说明触发条件、修改后的行为、验证命令与未验证范围。不要添加未经实测的性能或兼容性保证。禁止将个人草稿、凭证、真实上传文件写入测试夹具、截图或报告。
 
-目前没有配置远端仓库或贡献接收地址；开源许可确定后再正式接受外部贡献。
+仓库：[honkinglin/MarkEdit](https://github.com/honkinglin/MarkEdit)。本项目采用 MIT 许可，欢迎通过仓库 Issue/PR 提交反馈和贡献。

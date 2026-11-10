@@ -53,6 +53,7 @@ export function CommandMenu({
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
+              event.preventDefault();
               const first = matching.find((command) => !command.disabled);
               if (first) {
                 onClose();
