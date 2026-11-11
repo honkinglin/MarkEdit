@@ -93,6 +93,22 @@ test('扩展渲染与非法图表局部回退', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '正文仍然可用' })).toBeVisible();
 });
 
+test('中英文界面切换并记住选择', async ({ page }) => {
+  await ready(page);
+  const languageButton = page.getByRole('button', { name: 'Switch interface language to Chinese' });
+  await languageButton.click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+  await expect(page.getByRole('button', { name: '导出 Markdown' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '切换界面语言为英文' })).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+  await expect(page.getByRole('button', { name: '导出 Markdown' })).toBeVisible();
+  await page.getByRole('button', { name: '切换界面语言为英文' }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('button', { name: 'Export Markdown' })).toBeVisible();
+});
+
 test.describe('English defaults', () => {
   test.use({ locale: 'zh-CN' });
 
@@ -105,7 +121,8 @@ test.describe('English defaults', () => {
     await expect(
       page.getByRole('heading', { name: 'Give your ideas room to grow.' }),
     ).toBeVisible();
-    await expect(page.locator('body')).not.toContainText(/[\u3400-\u9fff]/);
+    const bodyText = await page.locator('body').innerText();
+    expect(bodyText.replace('中文', '')).not.toMatch(/[\u3400-\u9fff]/);
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
       false,
     );
@@ -117,7 +134,8 @@ test.describe('English defaults', () => {
     await expect(page.getByText('0 characters', { exact: false })).toBeVisible();
     await page.getByRole('button', { name: 'Version history', exact: true }).click();
     await expect(page.getByRole('region', { name: 'Version history' })).toBeVisible();
-    await expect(page.locator('body')).not.toContainText(/[\u3400-\u9fff]/);
+    const updatedBodyText = await page.locator('body').innerText();
+    expect(updatedBodyText.replace('中文', '')).not.toMatch(/[\u3400-\u9fff]/);
   });
 });
 

@@ -1,6 +1,16 @@
-import { messages } from '../../i18n';
+import { messagesFor } from '../../i18n';
+import type { EditorLocale } from '../../i18n';
 import { useEffect, useState } from 'react';
-export function MathFormula({ source, display }: { source: string; display: boolean }) {
+export function MathFormula({
+  source,
+  display,
+  locale = 'en',
+}: {
+  source: string;
+  display: boolean;
+  locale?: EditorLocale;
+}) {
+  const messages = messagesFor(locale);
   const [result, setResult] = useState<{ key: string; html?: string; error?: string } | null>(null);
   const key = `${display}:${source}`;
   useEffect(() => {
@@ -8,7 +18,7 @@ export function MathFormula({ source, display }: { source: string; display: bool
     void import('../../lib/math')
       .then((module) => {
         if (canceled) return;
-        setResult({ key, html: module.renderFormula(source, display) });
+        setResult({ key, html: module.renderFormula(source, display, locale) });
       })
       .catch((error: unknown) => {
         if (!canceled)
@@ -20,7 +30,7 @@ export function MathFormula({ source, display }: { source: string; display: bool
     return () => {
       canceled = true;
     };
-  }, [source, display, key]);
+  }, [source, display, key, locale]);
   const current = result?.key === key ? result : null;
   if (current?.error)
     return (

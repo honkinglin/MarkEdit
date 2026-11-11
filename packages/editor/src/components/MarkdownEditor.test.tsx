@@ -108,6 +108,22 @@ describe('公共 React 编辑器契约', () => {
     expect(view().state.selection.main.to).toBe(4);
     expect(view().state.field(field)).toBe(42);
   });
+  it('按 locale 显示中文控件文案，并可原位切回英文', async () => {
+    await act(async () => root.render(<MarkdownEditor defaultValue="# 标题" locale="zh" />));
+    const original = view();
+    expect(original.state.phrase('Find')).toBe('查找');
+    expect(host.querySelector('button[aria-label="粗体"]')).not.toBeNull();
+    expect(host.querySelector('article[aria-label="Markdown 预览"]')).not.toBeNull();
+    await act(async () =>
+      host.querySelector<HTMLButtonElement>('button[aria-label="表格"]')!.click(),
+    );
+    expect(document.querySelector('dialog h2')?.textContent).toBe('插入表格');
+    await act(async () => root.render(<MarkdownEditor defaultValue="# 标题" locale="en" />));
+    expect(view()).toBe(original);
+    expect(original.state.phrase('Find')).toBe('Find');
+    expect(host.querySelector('button[aria-label="Bold"]')).not.toBeNull();
+    expect(document.querySelector('dialog h2')?.textContent).toBe('Insert table');
+  });
   it('卸载销毁 CodeMirror，重新挂载不复用内容', async () => {
     await act(async () => root.render(<MarkdownEditor ref={first} defaultValue="old" />));
     const destroy = vi.spyOn(view(), 'destroy');

@@ -1,6 +1,16 @@
-import { messages } from '../../i18n';
+import { messagesFor } from '../../i18n';
+import type { EditorLocale } from '../../i18n';
 import { useEffect, useState } from 'react';
-export function CodeBlock({ source, language }: { source: string; language: string }) {
+export function CodeBlock({
+  source,
+  language,
+  locale = 'en',
+}: {
+  source: string;
+  language: string;
+  locale?: EditorLocale;
+}) {
+  const messages = messagesFor(locale);
   const [result, setResult] = useState<{
     source: string;
     language: string;

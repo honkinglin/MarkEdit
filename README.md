@@ -104,9 +104,9 @@ Read the [API and integration guide](packages/editor/README.md) for state contra
 
 ## Language support
 
-**English is the default and currently the only supported interface language**, regardless of browser language. This includes dialogs, accessibility labels, notices, new document templates, and the component example. Existing documents and imported content are preserved in their original language.
+The workspace UI supports **English and Simplified Chinese**. English is the default; use the language button in the top bar to switch languages. Your choice is saved in this browser and is not inferred from the browser's language. Switching languages only changes the interface—documents, imported content, and the English welcome example are not translated.
 
-UI copy lives in typed English catalogs under `src/i18n`, `packages/editor/src/i18n`, and `examples/react-consumer/src/i18n`. Parameterized messages handle counts and dynamic text; dates and numbers use English formatting. See the [localization guide](project/LOCALIZATION.md) before adding another locale. Internal development records may still be in Chinese.
+The workspace and reusable editor have typed English and Chinese catalogs. The React components accept an optional `locale` prop (`en` or `zh`), defaulting to English. See the [localization guide](project/LOCALIZATION.md) for catalog boundaries and persistence behavior.
 
 ## Engineering foundations
 

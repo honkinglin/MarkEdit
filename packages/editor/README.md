@@ -45,6 +45,7 @@ Run `npm run example:setup` and `npm run example:dev` from the root for an indep
 | `onChange`           | `(value: string) => void`                    | Changes from editing, toolbar actions, or ref insertion. External prop updates do not trigger it.                               |
 | `readOnly`           | `boolean` / `false`                          | Blocks editing, toolbar changes, ref insertion, and pending upload insertion. Selection, copying, and preview remain available. |
 | `theme`              | `'light' \| 'dark'` / `'light'`              | Per-instance theme; switching preserves the editor and selection.                                                               |
+| `locale`             | `'en' \| 'zh'` / `'en'`                      | Per-instance interface language for editor controls, dialogs, and preview messages.                                             |
 | `mode`               | `'edit' \| 'split' \| 'preview'` / `'split'` | Hidden panes preserve editor state and undo history.                                                                            |
 | `toolbar`            | `boolean \| readonly ToolbarItem[]` / `true` | Hide the toolbar or choose built-in items in their standard order.                                                              |
 | `extensions`         | CodeMirror `Extension[]`                     | Trusted host extensions. Keep the array reference stable.                                                                       |
@@ -105,7 +106,7 @@ const headings = getHeadings('# Heading', prefix);
 <MarkdownPreview value="# Heading" headingPrefix={prefix} theme="light" />;
 ```
 
-Required prop: `value: string`. Optional props: `theme`, `className`, `style`, `headingPrefix`, and `onHeadings`. By default, each preview generates its own prefix with React `useId`; hosts must keep custom prefixes unique. `getHeadings(value, prefix = '')` returns `{ id, text, depth, line }[]` without reading the DOM.
+Required prop: `value: string`. Optional props: `locale`, `theme`, `className`, `style`, `headingPrefix`, and `onHeadings`. By default, each preview generates its own prefix with React `useId`; hosts must keep custom prefixes unique. `getHeadings(value, prefix = '', locale = 'en')` returns `{ id, text, depth, line }[]` without reading the DOM.
 
 ### Reuse the rendered outline
 
@@ -115,7 +116,7 @@ The workspace uses this callback and hides stale outlines while another document
 
 ## Language
 
-English is the default and currently the only supported interface language, including accessible names, dialogs, notifications, and inserted placeholders. Browser language does not change it. Document content is never translated. UI copy is centralized in `src/i18n`; a per-instance locale API can be added when another locale is supported. CodeMirror's built-in controls already use English by default.
+The package supports English (`en`) and Simplified Chinese (`zh`). `MarkdownEditor` and `MarkdownPreview` each accept a per-instance `locale` prop, defaulting to English. Accessible names, dialogs, notifications, preview errors, generated placeholders, and CodeMirror's search panel use that locale. Changing the UI language never translates document content.
 
 ## Styling and packaging
 

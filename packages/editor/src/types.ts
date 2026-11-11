@@ -2,6 +2,7 @@ import type { CSSProperties, Ref } from 'react';
 import type { Extension } from '@codemirror/state';
 import type { Heading } from './lib/headings';
 import type { UploadImage } from './lib/insertions';
+import type { EditorLocale } from './i18n';
 export type EditorTheme = 'light' | 'dark';
 export type EditorMode = 'edit' | 'split' | 'preview';
 export type ToolbarItem =
@@ -14,6 +15,7 @@ export interface MarkdownEditorHandle {
   jumpToLine(line: number): void;
 }
 interface CommonEditorProps {
+  locale?: EditorLocale;
   readOnly?: boolean;
   theme?: EditorTheme;
   mode?: EditorMode;
@@ -35,6 +37,7 @@ export type MarkdownEditorProps = CommonEditorProps &
   );
 export interface MarkdownPreviewProps {
   value: string;
+  locale?: EditorLocale;
   theme?: EditorTheme;
   className?: string;
   style?: CSSProperties;

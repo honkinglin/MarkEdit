@@ -1,5 +1,8 @@
 /** English UI copy. Keep complete sentences here so future locales can change word order. */
+const codeMirrorPhrases: Record<string, string> = {};
+
 export const en = {
+  codeMirrorPhrases,
   insertLink: 'Insert link',
   insertImage: 'Insert image',
   insertTable: 'Insert table',

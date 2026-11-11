@@ -1,5 +1,5 @@
 import { messages } from '../i18n';
-import { initialDraft, parseDraft } from './draft';
+import { initialDraft, isLegacyWelcomeDraft, parseDraft } from './draft';
 
 export interface Snapshot {
   id: string;
@@ -23,6 +23,8 @@ export class ConflictError extends Error {
     super(messages.documentConflict);
   }
 }
+export const ENGLISH_WELCOME_MIGRATION_KEY = 'english-welcome-v1';
+
 export function newDocument(input: DocumentInput): DocumentRecord {
   const now = Date.now();
   return {
@@ -96,12 +98,43 @@ export class DocumentRepository {
   async initialize(readLegacy: () => string | null) {
     return this.transact('readwrite', async (tx) => {
       const meta = tx.objectStore('meta');
-      if (await request(meta.get('initialized'))) return;
+      if (await request(meta.get('initialized'))) {
+        if (!(await request(meta.get(ENGLISH_WELCOME_MIGRATION_KEY)))) {
+          const store = tx.objectStore('documents');
+          const docs = await request<DocumentRecord[]>(store.getAll());
+          const welcome = docs
+            .filter(
+              (doc) =>
+                doc.deletedAt === null &&
+                doc.revision === 1 &&
+                doc.createdAt === doc.updatedAt &&
+                Array.isArray(doc.snapshots) &&
+                doc.snapshots.length === 0 &&
+                isLegacyWelcomeDraft(doc),
+            )
+            .sort((a, b) => a.createdAt - b.createdAt)[0];
+          if (welcome) {
+            await request(
+              store.put({
+                ...welcome,
+                name: initialDraft.name,
+                content: initialDraft.content,
+                revision: welcome.revision + 1,
+                updatedAt: Date.now(),
+              }),
+            );
+          }
+          await request(meta.put(true, ENGLISH_WELCOME_MIGRATION_KEY));
+        }
+        return;
+      }
       // Only consult localStorage on first initialization. Parsing failure leaves the database untouched.
       const raw = readLegacy();
-      const draft = raw === null ? initialDraft : parseDraft(raw);
+      const restored = raw === null ? initialDraft : parseDraft(raw);
+      const draft = isLegacyWelcomeDraft(restored) ? initialDraft : restored;
       await request(tx.objectStore('documents').add(newDocument(draft)));
       await request(meta.put(true, 'initialized'));
+      await request(meta.put(true, ENGLISH_WELCOME_MIGRATION_KEY));
     });
   }
   async list(): Promise<DocumentRecord[]> {

@@ -1,8 +1,9 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
+import type { EditorLocale } from '../i18n';
 import CodeMirror, { ExternalChange } from '@uiw/react-codemirror';
-import { Prec, type Extension } from '@codemirror/state';
+import { EditorState, Prec, type Extension } from '@codemirror/state';
 import type { ToolbarItem } from '../types';
 import { markdownLanguage, markdownKeymap, pasteURLAsLink } from '@codemirror/lang-markdown';
 import { EditorView, keymap } from '@codemirror/view';
@@ -13,57 +14,6 @@ import { imageFromFile } from '../lib/insertions';
 import type { UploadImage } from '../lib/insertions';
 
 const noExtensions: Extension[] = [];
-const formats = [
-  {
-    id: 'bold',
-    label: messages.bold,
-    icon: Bold,
-    before: '**',
-    after: '**',
-    placeholder: messages.boldText,
-  },
-  {
-    id: 'italic',
-    label: messages.italic,
-    icon: Italic,
-    before: '*',
-    after: '*',
-    placeholder: messages.italicText,
-  },
-  {
-    id: 'heading',
-    label: messages.heading,
-    icon: Heading2,
-    before: '## ',
-    after: '',
-    placeholder: messages.heading,
-    block: true,
-  },
-  {
-    id: 'quote',
-    label: messages.quote,
-    icon: Quote,
-    before: '> ',
-    after: '',
-    placeholder: messages.quotedText,
-    block: true,
-  },
-  {
-    id: 'list',
-    label: messages.list,
-    icon: List,
-    before: '- ',
-    after: '',
-    placeholder: messages.listItem,
-    block: true,
-  },
-];
-const dialogs = [
-  { kind: 'link', label: messages.link, icon: Link },
-  { kind: 'image', label: messages.image, icon: ImagePlus },
-  { kind: 'code', label: messages.codeBlock, icon: Code2 },
-  { kind: 'table', label: messages.table, icon: Table2 },
-] as const;
 export interface EditorInputHandle {
   focus: () => void;
   getValue: () => string;
@@ -82,8 +32,9 @@ export function EditorInput({
   uploadImage,
   toolbar = true,
   extensions: extraExtensions = noExtensions,
-  ariaLabel = messages.markdownSource,
+  ariaLabel: ariaLabelProp,
   portalDialogs = false,
+  locale = 'en',
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -96,7 +47,61 @@ export function EditorInput({
   extensions?: Extension[];
   ariaLabel?: string;
   portalDialogs?: boolean;
+  locale?: EditorLocale;
 }) {
+  const messages = messagesFor(locale);
+  const ariaLabel = ariaLabelProp ?? messages.markdownSource;
+  const formats = [
+    {
+      id: 'bold',
+      label: messages.bold,
+      icon: Bold,
+      before: '**',
+      after: '**',
+      placeholder: messages.boldText,
+    },
+    {
+      id: 'italic',
+      label: messages.italic,
+      icon: Italic,
+      before: '*',
+      after: '*',
+      placeholder: messages.italicText,
+    },
+    {
+      id: 'heading',
+      label: messages.heading,
+      icon: Heading2,
+      before: '## ',
+      after: '',
+      placeholder: messages.heading,
+      block: true,
+    },
+    {
+      id: 'quote',
+      label: messages.quote,
+      icon: Quote,
+      before: '> ',
+      after: '',
+      placeholder: messages.quotedText,
+      block: true,
+    },
+    {
+      id: 'list',
+      label: messages.list,
+      icon: List,
+      before: '- ',
+      after: '',
+      placeholder: messages.listItem,
+      block: true,
+    },
+  ];
+  const dialogs = [
+    { kind: 'link', label: messages.link, icon: Link },
+    { kind: 'image', label: messages.image, icon: ImagePlus },
+    { kind: 'code', label: messages.codeBlock, icon: Code2 },
+    { kind: 'table', label: messages.table, icon: Table2 },
+  ] as const;
   const view = useRef<EditorView | null>(null);
   const uploads = useRef(new Set<{ position: number }>());
   const [insertKind, setInsertKind] = useState<InsertKind | null>(null);
@@ -119,6 +124,7 @@ export function EditorInput({
   const extensions = useMemo(
     () => [
       ...extraExtensions,
+      EditorState.phrases.of(messages.codeMirrorPhrases),
       // Markdown-only syntax support avoids eagerly loading HTML/CSS/JS parsers.
       markdownLanguage,
       Prec.high(keymap.of(markdownKeymap)),
@@ -179,7 +185,7 @@ export function EditorInput({
         },
       }),
     ],
-    [disabled, onScrollLine, uploadImage, extraExtensions, ariaLabel],
+    [disabled, onScrollLine, uploadImage, extraExtensions, ariaLabel, locale],
   );
 
   async function insertFile(file: File, editor: EditorView, position: number) {
@@ -191,7 +197,7 @@ export function EditorInput({
     uploads.current.add(bookmark);
     setNotice(messages.uploadingImage);
     try {
-      const text = await imageFromFile(file, uploadImage);
+      const text = await imageFromFile(file, uploadImage, locale);
       if (!mounted.current || view.current !== editor || locked.current) return;
       editor.dispatch({
         changes: { from: bookmark.position, insert: `\n${text}\n` },
@@ -368,6 +374,7 @@ export function EditorInput({
         dark={dark}
         kind={disabled ? null : insertKind}
         selected={selected}
+        locale={locale}
         onClose={() => setInsertKind(null)}
         onInsert={insert}
       />

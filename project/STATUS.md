@@ -9,7 +9,7 @@ Reviewed on 2026-11-10 against the current implementation and development roadma
 - Markdown extensions: GFM, math, diagrams, syntax highlighting, insertion dialogs, and host-provided image upload callbacks.
 - React package: controlled/uncontrolled contracts, read-only state, configurable toolbar, extensions, ref commands, scoped styles, and independent tarball consumer.
 - Open-source foundations: MIT license, CI, API documentation, architecture records, reproducible checks, screenshots, and a Vercel Git integration.
-- English interface: localized UI catalogs, accessible names, notifications, error messages, new-document templates, English formatting, and English READMEs. Existing content is preserved.
+- Bilingual interface: persistent English/Simplified Chinese selection, localized workspace and reusable editor catalogs, locale-aware dates/counts, and unchanged document content.
 
 The English implementation is committed as `d150427`. The first performance pass is implemented locally: it reuses preview headings, removes eager embedded HTML language support, adds browser measurements, and introduces a CI bundle budget. See [PERFORMANCE.md](PERFORMANCE.md). These performance changes have not yet been committed or deployed.
 
@@ -25,7 +25,7 @@ The English implementation is committed as `d150427`. The first performance pass
 
 ## Deliberate scope boundaries
 
-- English is the only requested UI locale. Additional catalogs and language switching are future work, not a missing control in this release.
+- The UI supports English and Simplified Chinese; English remains the default and browser language does not select the locale.
 - The editor exposes an image upload callback; the workspace accepts image URLs. A hosted upload service is not included.
 - Accounts, cloud sync, collaboration, AI, rich-text WYSIWYG, and native mobile apps are outside the first release.
 - An offline service worker is not implemented. Local document storage does not guarantee that the application can cold-start offline.

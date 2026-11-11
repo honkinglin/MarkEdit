@@ -44,7 +44,7 @@ export function DocumentSidebar({
         </button>
       </div>
       <div className="workspace-label">
-        {messages.personalWorkspace} <span>LOCAL</span>
+        {messages.personalWorkspace} <span>{messages.local}</span>
       </div>
       <div className="library-tabs">
         <button aria-pressed={!trash} onClick={() => setTrash(false)}>

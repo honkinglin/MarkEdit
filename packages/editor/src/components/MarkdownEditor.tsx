@@ -1,4 +1,4 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
 import {
   useCallback,
   useImperativeHandle,
@@ -28,9 +28,12 @@ export function MarkdownEditor({
   height = 480,
   className = '',
   style,
-  ariaLabel = messages.markdownSource,
+  ariaLabel: ariaLabelProp,
+  locale = 'en',
   ref,
 }: MarkdownEditorProps) {
+  const messages = messagesFor(locale);
+  const ariaLabel = ariaLabelProp ?? messages.markdownSource;
   const controlled = useRef(value !== undefined).current;
   const [internal, setInternal] = useState(defaultValue);
   const [revision, refresh] = useReducer((n: number) => n + 1, 0);
@@ -86,6 +89,7 @@ export function MarkdownEditor({
           portalDialogs
           toolbar={toolbar}
           extensions={extensions}
+          locale={locale}
           uploadImage={uploadImage}
           ariaLabel={ariaLabel}
           onScrollLine={onEditorScroll}
@@ -97,7 +101,7 @@ export function MarkdownEditor({
         hidden={mode === 'edit'}
         onScroll={onPreviewScroll}
       >
-        <MarkdownPreview value={deferred} theme={theme} />
+        <MarkdownPreview value={deferred} theme={theme} locale={locale} />
       </div>
     </div>
   );

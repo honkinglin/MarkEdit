@@ -1,5 +1,9 @@
 import { en } from './en';
 
-/** English is the only supported locale. Browser language never changes this default. */
-export const locale = 'en' as const;
+import { zh } from './zh';
+
+export type EditorLocale = 'en' | 'zh';
 export const messages = en;
+export function messagesFor(locale: EditorLocale = 'en') {
+  return locale === 'zh' ? zh : en;
+}

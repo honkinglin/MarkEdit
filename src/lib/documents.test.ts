@@ -1,7 +1,13 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ConflictError, exportBackup, openRepository } from './documents';
+import {
+  ConflictError,
+  ENGLISH_WELCOME_MIGRATION_KEY,
+  exportBackup,
+  openRepository,
+} from './documents';
 import type { DocumentRepository } from './documents';
+import { initialDraft, legacyWelcomeDraft } from './draft';
 
 const opened: DocumentRepository[] = [];
 async function repository(name = crypto.randomUUID()) {
@@ -28,12 +34,67 @@ describe('IndexedDB 文档仓库', () => {
     expect(docs).toHaveLength(1);
     expect(docs[0]).toMatchObject({ name: '旧草稿.md', content: '' });
   });
+  it('仅将未编辑的旧欢迎文档替换为英文示例', async () => {
+    const name = crypto.randomUUID();
+    const repo = await repository(name);
+    await repo.initialize(() => null);
+    const [welcome] = await repo.list();
+    const userDoc = await repo.create({ name: 'My notes.md', content: 'Keep my writing.' });
+    repo.close();
+
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const open = indexedDB.open(name, 1);
+      open.onsuccess = () => resolve(open.result);
+      open.onerror = () => reject(open.error);
+    });
+    const tx = db.transaction(['documents', 'meta'], 'readwrite');
+    const done = new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+    tx.objectStore('documents').put({
+      ...welcome,
+      name: legacyWelcomeDraft.name,
+      content: legacyWelcomeDraft.content,
+      updatedAt: welcome.createdAt,
+      revision: 1,
+      snapshots: [],
+    });
+    tx.objectStore('meta').delete(ENGLISH_WELCOME_MIGRATION_KEY);
+    await done;
+    db.close();
+
+    const upgraded = await repository(name);
+    await upgraded.initialize(() => {
+      throw new Error('Already initialized');
+    });
+    const docs = await upgraded.list();
+    expect(docs.find((doc) => doc.id === welcome.id)).toMatchObject({
+      name: initialDraft.name,
+      content: initialDraft.content,
+      revision: 2,
+    });
+    expect(docs.find((doc) => doc.id === userDoc.id)).toMatchObject({
+      name: 'My notes.md',
+      content: 'Keep my writing.',
+    });
+  });
   it('迁移失败不写入默认文档，可以修复后重试', async () => {
     const repo = await repository();
     await expect(repo.initialize(() => '{invalid')).rejects.toThrow();
     expect(await repo.list()).toEqual([]);
     await repo.initialize(() => JSON.stringify({ version: 1, name: '恢复.md', content: '中文' }));
     expect((await repo.list())[0].content).toBe('中文');
+  });
+  it('初次导入旧欢迎草稿时使用英文示例', async () => {
+    const repo = await repository();
+    await repo.initialize(() => JSON.stringify(legacyWelcomeDraft));
+    const [welcome] = await repo.list();
+    expect(welcome).toMatchObject({
+      name: initialDraft.name,
+      content: initialDraft.content,
+    });
   });
   it('并发启动只迁移一份旧草稿', async () => {
     const name = crypto.randomUUID();

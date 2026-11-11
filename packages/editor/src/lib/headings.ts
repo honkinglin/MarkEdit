@@ -1,4 +1,5 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
+import type { EditorLocale } from '../i18n';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -14,7 +15,8 @@ export interface Heading {
   line: number;
 }
 const parser = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
-export function annotateHeadings(tree: Root, prefix = ''): Heading[] {
+export function annotateHeadings(tree: Root, prefix = '', locale: EditorLocale = 'en'): Heading[] {
+  const messages = messagesFor(locale);
   const headings: Heading[] = [];
   const used = new Set<string>();
   visit(tree, 'heading', (node) => {
@@ -48,11 +50,11 @@ export function annotateHeadings(tree: Root, prefix = ''): Heading[] {
   });
   return headings;
 }
-export function getHeadings(value: string, prefix = '') {
-  return annotateHeadings(parser.parse(value), prefix);
+export function getHeadings(value: string, prefix = '', locale: EditorLocale = 'en') {
+  return annotateHeadings(parser.parse(value), prefix, locale);
 }
-export function remarkHeadings(options?: { prefix?: string }) {
+export function remarkHeadings(options?: { prefix?: string; locale?: EditorLocale }) {
   return (tree: Root) => {
-    annotateHeadings(tree, options?.prefix);
+    annotateHeadings(tree, options?.prefix, options?.locale);
   };
 }

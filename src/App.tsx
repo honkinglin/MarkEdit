@@ -1,4 +1,4 @@
-import { messages } from './i18n';
+import { activateLocale, getSavedLocale, messages, persistLocale } from './i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
@@ -10,6 +10,7 @@ import {
   Command as CommandIcon,
   Focus,
   History,
+  Languages,
   ListTree,
   Moon,
   PanelLeftClose,
@@ -59,6 +60,8 @@ function downloadText(name: string, content: string, type = 'text/markdown;chars
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export default function App() {
+  const [language, setLanguage] = useState(getSavedLocale);
+  activateLocale(language);
   const workspace = useWorkspace();
   const { active, documents, status, error, conflict, busy, ready } = workspace;
   const [preferences] = useState(readPreferences);
@@ -104,6 +107,14 @@ export default function App() {
       /* Preferences are optional; document storage has its own error handling. */
     }
   }, [dark, ratio]);
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+  function toggleLanguage() {
+    const next = language === 'en' ? 'zh' : 'en';
+    persistLocale(next);
+    setLanguage(next);
+  }
   const flush = workspace.flush;
   useEffect(() => {
     const shortcuts = (event: KeyboardEvent) => {
@@ -270,6 +281,15 @@ export default function App() {
             </button>
             <button
               className="text-button"
+              aria-label={language === 'en' ? messages.switchToChinese : messages.switchToEnglish}
+              title={language === 'en' ? messages.switchToChinese : messages.switchToEnglish}
+              onClick={toggleLanguage}
+            >
+              <Languages size={16} />
+              {language === 'en' ? '中文' : 'English'}
+            </button>
+            <button
+              className="text-button"
               disabled={!ready || busy}
               onClick={() => fileInput.current?.click()}
             >
@@ -337,7 +357,7 @@ export default function App() {
           <>
             <div className="document-heading">
               <div>
-                <div className="eyebrow">YOUR SPACE TO THINK</div>
+                <div className="eyebrow">{messages.yourSpaceToThink}</div>
                 <label className="title-label">
                   <input
                     aria-label={messages.documentName}
@@ -447,6 +467,7 @@ export default function App() {
                     onChange={(content) => workspace.edit({ content })}
                     dark={dark}
                     disabled={busy}
+                    locale={language}
                   />
                 </div>
                 <section
@@ -468,11 +489,15 @@ export default function App() {
                       {messages.scrollSync} {syncScroll ? messages.on : messages.off}
                     </button>
                     <span className="live-label">
-                      <span /> LIVE
+                      <span /> {messages.live}
                     </span>
                   </div>
                   <div className="preview-scroll" ref={previewContainer} onScroll={onPreviewScroll}>
-                    <MarkdownPreview value={preview} onHeadings={receiveHeadings} />
+                    <MarkdownPreview
+                      value={preview}
+                      onHeadings={receiveHeadings}
+                      locale={language}
+                    />
                   </div>
                 </section>
               </div>
@@ -507,7 +532,11 @@ export default function App() {
                         {[...active.snapshots].reverse().map((snapshot) => (
                           <div className="version-entry" key={snapshot.id}>
                             <strong>{snapshot.name || messages.untitledMd}</strong>
-                            <time>{new Date(snapshot.createdAt).toLocaleString('en')}</time>
+                            <time>
+                              {new Date(snapshot.createdAt).toLocaleString(
+                                language === 'zh' ? 'zh-CN' : 'en',
+                              )}
+                            </time>
                             <span>{messages.characterCount(snapshot.content.length)}</span>
                             <button
                               disabled={busy}

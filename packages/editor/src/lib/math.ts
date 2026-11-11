@@ -1,8 +1,10 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
+import type { EditorLocale } from '../i18n';
 import katex from 'katex';
 import './math.css';
-export function renderFormula(source: string, display: boolean) {
-  if (source.length > 10_000) throw new Error(messages.formulasMustNotExceed10000Characters);
+export function renderFormula(source: string, display: boolean, locale: EditorLocale = 'en') {
+  if (source.length > 10_000)
+    throw new Error(messagesFor(locale).formulasMustNotExceed10000Characters);
   return katex.renderToString(source, {
     displayMode: display,
     throwOnError: true,

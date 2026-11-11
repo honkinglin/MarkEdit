@@ -1,4 +1,5 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
+import type { EditorLocale } from '../i18n';
 import DOMPurify from 'dompurify';
 import mermaid from 'mermaid';
 mermaid.initialize({
@@ -22,9 +23,14 @@ mermaid.initialize({
 });
 let sequence = 0;
 let queue = Promise.resolve();
-export function renderDiagram(source: string, isCanceled: () => boolean): Promise<string> {
+export function renderDiagram(
+  source: string,
+  isCanceled: () => boolean,
+  locale: EditorLocale = 'en',
+): Promise<string> {
   const work = queue.then(async () => {
     if (isCanceled()) return '';
+    const messages = messagesFor(locale);
     if (source.length > 50_000) throw new Error(messages.diagramsMustNotExceed50000Characters);
     if (/%%\s*\{|^\s*---/.test(source)) throw new Error(messages.diagramConfigurationDisabled);
     const container = document.createElement('div');

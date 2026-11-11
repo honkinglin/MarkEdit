@@ -1,20 +1,16 @@
-import { messages } from '../i18n';
+import { messagesFor } from '../i18n';
+import type { EditorLocale } from '../i18n';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { fencedCode, linkMarkdown, tableMarkdown } from '../lib/insertions';
 export type InsertKind = 'link' | 'image' | 'table' | 'code';
-const titles = {
-  link: messages.insertLink,
-  image: messages.insertImage,
-  table: messages.insertTable,
-  code: messages.insertCodeBlock,
-};
 export function InsertDialog({
   kind,
   portal = false,
   dark = false,
   selected,
+  locale = 'en',
   onClose,
   onInsert,
 }: {
@@ -22,9 +18,17 @@ export function InsertDialog({
   portal?: boolean;
   dark?: boolean;
   selected: string;
+  locale?: EditorLocale;
   onClose: () => void;
   onInsert: (text: string, block: boolean) => void;
 }) {
+  const messages = messagesFor(locale);
+  const titles = {
+    link: messages.insertLink,
+    image: messages.insertImage,
+    table: messages.insertTable,
+    code: messages.insertCodeBlock,
+  };
   const titleId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const [label, setLabel] = useState('');
@@ -64,10 +68,10 @@ export function InsertDialog({
             if (!kind) return;
             const text =
               kind === 'table'
-                ? tableMarkdown(rows, columns)
+                ? tableMarkdown(rows, columns, locale)
                 : kind === 'code'
-                  ? fencedCode(code, language)
-                  : linkMarkdown(label, url, kind === 'image');
+                  ? fencedCode(code, language, locale)
+                  : linkMarkdown(label, url, kind === 'image', locale);
             onInsert(text, kind === 'table' || kind === 'code' || kind === 'image');
             onClose();
           } catch (reason) {

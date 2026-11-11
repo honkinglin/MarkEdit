@@ -11,5 +11,6 @@ export type {
   EditorTheme,
   ToolbarItem,
 } from './types';
+export type { EditorLocale } from './i18n';
 
 import './style.css';

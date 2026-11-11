@@ -24,6 +24,14 @@ Final verification: 55 unit tests and 32 browser tests passed. Type checks, prod
 - These changes are local; the latest inspected remote CI ([run 42755427315](https://github.com/honkinglin/MarkEdit/actions/runs/42755427315)) passed for `ca913f7`, before this English update.
 - Remaining work is tracked in [STATUS.md](STATUS.md).
 
+## Bilingual interface · 2026-11-11
+
+- The workspace language button switches between English and Simplified Chinese and persists the selection in browser storage.
+- The reusable editor and preview accept an independent `locale` prop; changing it updates controls without remounting CodeMirror.
+- The welcome document and user-authored Markdown remain unchanged when switching interface language.
+- `npm test`: 59 tests pass; `npm run typecheck`, `npm run format:check`, `npm run build`, and `npm run verify:lib` pass.
+- `npm run test:e2e`: all 36 tests pass across Chromium, Firefox, WebKit, and mobile Chromium, including locale persistence and English-default checks.
+
 ## P5 baseline (historical)
 
 日期：2026-11-09。环境：macOS arm64、Node 24.14；本地生产构建与独立 tarball 消费示例。结果针对当前工作区，不能替代推送后的 GitHub CI 和线上域名验收。
